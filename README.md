@@ -159,23 +159,6 @@ through its own task tool rather than Claude Code's `Agent` tool, so where the
 `build` skill says "spawn the `build-reviewer` subagent", OpenCode will dispatch
 to this agent by name - the loop behaves the same.
 
-To match the original reviewer's high reasoning effort, set the effort in
-`opencode.json` (reasoning options live in the JSON config, not the agent
-frontmatter):
-
-```json
-{
-  "agent": {
-    "build-reviewer": {
-      "model": "opencode-go/kimi-k2.6",
-      "reasoningEffort": "max"
-    }
-  }
-}
-```
-
-Effort levels are provider-dependent.
-
 ## Licence
 
 Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the
