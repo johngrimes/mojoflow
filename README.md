@@ -145,7 +145,7 @@ keeping the original system prompt body:
 ---
 description: Independent adversarial reviewer for the build loop. Read-only. Judges an implementation against its full specification bundle and returns a verdict plus actionable feedback.
 mode: subagent
-model: anthropic/claude-opus-4-8
+model: deepseek/deepseek-v4-pro
 temperature: 0.1
 permission:
   edit: deny
