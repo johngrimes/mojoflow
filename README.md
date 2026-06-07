@@ -56,6 +56,27 @@ approval gates:
 The skill is self-contained: it owns its templates and wireframing assets and
 calls no external CLI or other skill.
 
+#### Why grill instead of just reading a spec
+
+The grilling step exists because reading a large specification is an unreliable
+way to build shared understanding. A long document invites skimming, lets
+ambiguity hide in prose, and gives no signal about which parts were actually
+absorbed. The interview replaces that with a focused exchange: one question at a
+time, each forcing a concrete decision, until nothing material is left
+unresolved. The understanding is built through the act of answering rather than
+assumed from the act of reading.
+
+It follows that the resulting spec is written for the agent, not for a human
+reader. It is the precise, machine-consumable record of the decisions reached
+during the interview - the input `build` works from - not a document anyone is
+expected to sit down and read. That also means there is little value in
+committing the specs to the repository. They are an artifact of a particular
+agent session, not source. These specs live under `.local/`, which is ignored
+by Git at a global level, and they stay out of version control by design.
+
+The grilling idea comes from Matt Pocock's
+[Grill Me skill](https://www.aihero.dev/skills-grill-me).
+
 ### build
 
 Implements a feature from the `spec` bundle, then runs an adversarial review
