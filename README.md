@@ -1,6 +1,6 @@
 # MojoFlow
 
-A small pair of Claude Code skills for an agentic coding workflow. You take a
+A small pair of Claude Code skills for an agentic coding workflow, taking a
 feature from a rough idea to a finished, reviewed implementation in two moves:
 
 1. **`spec`** - interview yourself to a shared understanding, then write a
@@ -8,18 +8,18 @@ feature from a rough idea to a finished, reviewed implementation in two moves:
 2. **`build`** - implement that bundle, then run an adversarial build-and-review
    loop until an independent reviewer is satisfied.
 
-The two skills are designed to hand off cleanly: `spec` produces a feature
-directory under the project's `.local/specs/`, and `build` consumes it.
+The two skills hand off cleanly: `spec` produces a feature directory under the
+project's `.local/specs/`, and `build` consumes it.
 
-The overall shape of the flow - the spec → plan → tasks progression, the
-artifact set (`spec.md`, `plan.md`, `tasks.md`, `research.md`, `data-model.md`,
-`contracts/`, `quickstart.md`), the sequential `NNN-short-name` feature
-directories, and the idea of a project constitution - draws on GitHub's
+The overall shape - the spec → plan → tasks progression, the artifact set
+(`spec.md`, `plan.md`, `tasks.md`, `research.md`, `data-model.md`, `contracts/`,
+`quickstart.md`), the sequential `NNN-short-name` feature directories, and the
+project constitution - draws on GitHub's
 [spec-kit](https://github.com/github/spec-kit).
 
 A third skill, **`constitution`**, is a companion to the flow rather than a step
-in it: it drafts (or amends) a project's non-negotiable principles and writes
-them into the project's `CLAUDE.md`, where `spec` and `build` then honour them.
+in it: it drafts or amends a project's non-negotiable principles and writes them
+into `CLAUDE.md`, where `spec` and `build` then honour them.
 
 ## What's here
 
@@ -50,8 +50,7 @@ approval gates:
 2. Create the next sequential feature directory `NNN-short-name` under
    `<repo-root>/.local/specs/`.
 3. Write `spec.md` (what and why, not how) plus a requirements checklist.
-4. Generate lo-fi HTML wireframes into `wireframes/`, but only if the feature
-   has a UI.
+4. Generate lo-fi HTML wireframes into `wireframes/`, if the feature has a UI.
 5. **Grill** on the technical approach - stack, frameworks, storage, testing,
    structure, interface contracts.
 6. Write `plan.md` with a constitution check, plus `research.md`,
@@ -64,21 +63,19 @@ calls no external CLI or other skill.
 
 #### Why grill instead of just reading a spec
 
-The grilling step exists because reading a large specification is an unreliable
-way to build shared understanding. A long document invites skimming, lets
-ambiguity hide in prose, and gives no signal about which parts were actually
-absorbed. The interview replaces that with a focused exchange: one question at a
-time, each forcing a concrete decision, until nothing material is left
-unresolved. The understanding is built through the act of answering rather than
-assumed from the act of reading.
+Reading a large specification is an unreliable way to build shared
+understanding. A long document invites skimming, lets ambiguity hide in prose,
+and gives no signal about which parts were actually absorbed. The interview
+replaces that with a focused exchange: one question at a time, each forcing a
+concrete decision, until nothing material is left unresolved.
 
-It follows that the resulting spec is written for the agent, not for a human
-reader. It is the precise, machine-consumable record of the decisions reached
-during the interview - the input `build` works from - not a document anyone is
-expected to sit down and read. That also means there is little value in
-committing the specs to the repository. They are an artifact of a particular
-agent session, not source. These specs live under `.local/`, which is ignored
-by Git at a global level, and they stay out of version control by design.
+It follows that the resulting spec is written for the agent, not a human reader
+
+- a precise, machine-consumable record of the decisions reached, and the input
+  `build` works from. There is little value in committing these specs: they are
+  an artifact of a particular agent session, not source. They live under
+  `.local/`, which is ignored by Git globally, and stay out of version control
+  by design.
 
 The grilling idea comes from Matt Pocock's
 [Grill Me skill](https://www.aihero.dev/skills-grill-me).
@@ -106,9 +103,9 @@ genuinely complete, and the reviewer returns `VERDICT: SATISFIED`.
 
 An independent, read-only, deliberately adversarial reviewer. It reads the
 specification bundle directly (never the orchestrator's summary), proves the
-implementation works end to end by actually running it, attacks the weakest
-points, and returns a machine-readable verdict plus an ordered list of required
-changes. `build` spawns it fresh each round.
+implementation works end to end by running it, attacks the weakest points, and
+returns a machine-readable verdict plus an ordered list of required changes.
+`build` spawns it fresh each round.
 
 ### constitution
 
@@ -122,8 +119,8 @@ reviewed:
    principles, any non-negotiables to capture verbatim.
 3. Draft declarative, testable principles from the template, one concern each,
    with a short rationale where the reason is not obvious.
-4. Write the result into a single `## Constitution` section of the project's
-   `CLAUDE.md`, so it loads into every Claude Code session automatically.
+4. Write the result into a single `## Constitution` section of `CLAUDE.md`, so
+   it loads into every Claude Code session automatically.
 
 Because the constitution lives in `CLAUDE.md`, both `spec` (which runs a
 constitution check while planning) and `build` pick it up without any extra
@@ -131,11 +128,11 @@ wiring.
 
 ## Installation (Claude Code)
 
-These are standard Claude Code skills. To use them, place the `spec`, `build`
-and `constitution` directories under a skills directory Claude Code reads -
-typically `~/.claude/skills/` for personal use or `.claude/skills/` within a
-project - and place `agents/build-reviewer.md` under the matching `agents/`
-directory so `build` can find its reviewer.
+These are standard Claude Code skills. Place the `spec`, `build` and
+`constitution` directories under a skills directory Claude Code reads - typically
+`~/.claude/skills/` for personal use or `.claude/skills/` within a project - and
+place `agents/build-reviewer.md` under the matching `agents/` directory so
+`build` can find its reviewer.
 
 ## Usage
 
@@ -156,7 +153,7 @@ both skills run there with one adaptation for the reviewer agent.
 ### Install the skills
 
 OpenCode discovers skills by walking up from the working directory to the git
-root and scanning, among others, `.claude/skills/<name>/SKILL.md` and
+root, scanning (among others) `.claude/skills/<name>/SKILL.md` and
 `~/.claude/skills/<name>/SKILL.md` - the same locations Claude Code uses. So if
 the skills are already installed for Claude Code, OpenCode finds them with no
 further work. Otherwise place them under one of OpenCode's own paths:
@@ -164,9 +161,8 @@ further work. Otherwise place them under one of OpenCode's own paths:
 - Project: `.opencode/skills/spec/` and `.opencode/skills/build/`
 - Global: `~/.config/opencode/skills/spec/` and `~/.config/opencode/skills/build/`
 
-The `name` and `description` frontmatter fields both skills already carry are
-the only required ones; the `argument-hint` field is Claude-specific and is
-ignored by OpenCode.
+The `name` and `description` frontmatter both skills carry are the only required
+fields; the Claude-specific `argument-hint` is ignored by OpenCode.
 
 ### Enable them
 
@@ -208,16 +204,14 @@ permission:
 ```
 
 Set `model` to whichever provider and model you run. OpenCode invokes subagents
-through its own task tool rather than Claude Code's `Agent` tool, so where the
-`build` skill says "spawn the `build-reviewer` subagent", OpenCode will dispatch
-to this agent by name - the loop behaves the same.
+through its own task tool, so where `build` says "spawn the `build-reviewer`
+subagent", OpenCode dispatches to this agent by name - the loop behaves the same.
 
 ## Other workflows worth a look
 
-This is simply my preferred way of working. It suits how I like to think a
-feature through before any code is written, but it is one option among many.
-The agentic coding space is moving quickly, and there is a rich and growing
-ecosystem of skills, workflows and tools to draw on. A few worth exploring:
+This is simply my preferred way of working - it suits how I like to think a
+feature through before any code is written, but it is one option among many. A
+few others worth exploring:
 
 - [GitHub spec-kit](https://github.com/github/spec-kit) - the spec → plan →
   tasks toolkit this flow borrows its overall shape from.
@@ -230,7 +224,7 @@ ecosystem of skills, workflows and tools to draw on. A few worth exploring:
 - [Superpowers](https://github.com/obra/superpowers) - Jesse Vincent's broad
   collection of Claude Code skills for everyday development.
 - [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) - a
-  curated catalogue of Claude Code skills, commands and workflows to browse.
+  curated catalogue of Claude Code skills, commands and workflows.
 
 ## Licence
 
