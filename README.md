@@ -146,7 +146,6 @@ keeping the original system prompt body:
 description: Independent adversarial reviewer for the build loop. Read-only. Judges an implementation against its full specification bundle and returns a verdict plus actionable feedback.
 mode: subagent
 model: opencode-go/deepseek-v4-pro
-temperature: 0.1
 permission:
   edit: deny
   bash: allow
@@ -159,6 +158,23 @@ Set `model` to whichever provider and model you run. OpenCode invokes subagents
 through its own task tool rather than Claude Code's `Agent` tool, so where the
 `build` skill says "spawn the `build-reviewer` subagent", OpenCode will dispatch
 to this agent by name - the loop behaves the same.
+
+To match the original reviewer's high reasoning effort, set the effort in
+`opencode.json` (reasoning options live in the JSON config, not the agent
+frontmatter):
+
+```json
+{
+  "agent": {
+    "build-reviewer": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "reasoningEffort": "max"
+    }
+  }
+}
+```
+
+Effort levels are provider-dependent.
 
 ## Licence
 
