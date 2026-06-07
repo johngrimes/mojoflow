@@ -76,7 +76,7 @@ implementation works end to end by actually running it, attacks the weakest
 points, and returns a machine-readable verdict plus an ordered list of required
 changes. `build` spawns it fresh each round.
 
-## Installation
+## Installation (Claude Code)
 
 These are standard Claude Code skills. To use them, place the `spec` and `build`
 directories under a skills directory Claude Code reads - typically
@@ -94,6 +94,71 @@ place `agents/build-reviewer.md` under the matching `agents/` directory so
 `spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`.
 `build` defaults to the latest spec when no selector is given, and to a cap of
 three review rounds.
+
+## Using with OpenCode
+
+[OpenCode](https://opencode.ai) reads the same `SKILL.md` format natively, so
+both skills run there with one adaptation for the reviewer agent.
+
+### Install the skills
+
+OpenCode discovers skills by walking up from the working directory to the git
+root and scanning, among others, `.claude/skills/<name>/SKILL.md` and
+`~/.claude/skills/<name>/SKILL.md` - the same locations Claude Code uses. So if
+the skills are already installed for Claude Code, OpenCode finds them with no
+further work. Otherwise place them under one of OpenCode's own paths:
+
+- Project: `.opencode/skills/spec/` and `.opencode/skills/build/`
+- Global: `~/.config/opencode/skills/spec/` and `~/.config/opencode/skills/build/`
+
+The `name` and `description` frontmatter fields both skills already carry are
+the only required ones; the `argument-hint` field is Claude-specific and is
+ignored by OpenCode.
+
+### Enable them
+
+Skills are gated by pattern in `opencode.json`. Allow these two explicitly:
+
+```json
+{
+  "permission": {
+    "skill": {
+      "spec": "allow",
+      "build": "allow"
+    }
+  }
+}
+```
+
+Values are `allow`, `deny`, or `ask`, and patterns support wildcards.
+
+### Adapt the reviewer agent
+
+The `build` loop spawns a `build-reviewer` subagent. The provided
+`agents/build-reviewer.md` uses Claude Code's agent frontmatter, which OpenCode
+does not read. Create an OpenCode subagent at `.opencode/agent/build-reviewer.md`
+(or `~/.config/opencode/agent/build-reviewer.md`) with the OpenCode shape -
+`mode: subagent`, a provider-prefixed `model`, and a `permission` block -
+keeping the original system prompt body:
+
+```markdown
+---
+description: Independent adversarial reviewer for the build loop. Read-only. Judges an implementation against its full specification bundle and returns a verdict plus actionable feedback.
+mode: subagent
+model: anthropic/claude-opus-4-8
+temperature: 0.1
+permission:
+  edit: deny
+  bash: allow
+---
+
+(paste the system prompt body from agents/build-reviewer.md here)
+```
+
+Set `model` to whichever provider and model you run. OpenCode invokes subagents
+through its own task tool rather than Claude Code's `Agent` tool, so where the
+`build` skill says "spawn the `build-reviewer` subagent", OpenCode will dispatch
+to this agent by name - the loop behaves the same.
 
 ## Licence
 
