@@ -145,7 +145,7 @@ keeping the original system prompt body:
 ---
 description: Independent adversarial reviewer for the build loop. Read-only. Judges an implementation against its full specification bundle and returns a verdict plus actionable feedback.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/kimi-k2.6
 permission:
   edit: deny
   bash: allow
@@ -167,7 +167,7 @@ frontmatter):
 {
   "agent": {
     "build-reviewer": {
-      "model": "opencode-go/deepseek-v4-pro",
+      "model": "opencode-go/kimi-k2.6",
       "reasoningEffort": "max"
     }
   }
