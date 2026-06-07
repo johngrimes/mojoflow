@@ -11,6 +11,12 @@ feature from a rough idea to a finished, reviewed implementation in two moves:
 The two skills are designed to hand off cleanly: `spec` produces a feature
 directory under the project's `.local/specs/`, and `build` consumes it.
 
+The overall shape of the flow - the spec → plan → tasks progression, the
+artifact set (`spec.md`, `plan.md`, `tasks.md`, `research.md`, `data-model.md`,
+`contracts/`, `quickstart.md`), the sequential `NNN-short-name` feature
+directories, and the idea of a project constitution - draws on GitHub's
+[spec-kit](https://github.com/github/spec-kit).
+
 A third skill, **`constitution`**, is a companion to the flow rather than a step
 in it: it drafts (or amends) a project's non-negotiable principles and writes
 them into the project's `CLAUDE.md`, where `spec` and `build` then honour them.
