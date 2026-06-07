@@ -212,6 +212,26 @@ through its own task tool rather than Claude Code's `Agent` tool, so where the
 `build` skill says "spawn the `build-reviewer` subagent", OpenCode will dispatch
 to this agent by name - the loop behaves the same.
 
+## Other workflows worth a look
+
+This is simply my preferred way of working. It suits how I like to think a
+feature through before any code is written, but it is one option among many.
+The agentic coding space is moving quickly, and there is a rich and growing
+ecosystem of skills, workflows and tools to draw on. A few worth exploring:
+
+- [GitHub spec-kit](https://github.com/github/spec-kit) - the spec → plan →
+  tasks toolkit this flow borrows its overall shape from.
+- [OpenSpec](https://github.com/Fission-AI/OpenSpec) - a spec-driven workflow
+  with a stronger emphasis on persisted, version-controlled specifications.
+- [Matt Pocock's AI Hero skills](https://www.aihero.dev/skills) - including the
+  Grill Me skill the interview step here is based on.
+- [Geoffrey Huntley's "Ralph" technique](https://ghuntley.com/ralph/) - running
+  an agent in a continuous loop against a backlog.
+- [Superpowers](https://github.com/obra/superpowers) - Jesse Vincent's broad
+  collection of Claude Code skills for everyday development.
+- [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) - a
+  curated catalogue of Claude Code skills, commands and workflows to browse.
+
 ## Licence
 
 Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the
