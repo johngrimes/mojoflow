@@ -11,6 +11,10 @@ feature from a rough idea to a finished, reviewed implementation in two moves:
 The two skills are designed to hand off cleanly: `spec` produces a feature
 directory under the project's `.local/specs/`, and `build` consumes it.
 
+A third skill, **`constitution`**, is a companion to the flow rather than a step
+in it: it drafts (or amends) a project's non-negotiable principles and writes
+them into the project's `CLAUDE.md`, where `spec` and `build` then honour them.
+
 ## What's here
 
 ```
@@ -20,6 +24,9 @@ spec/                       The /spec skill
   wireframing/              lo-fi HTML wireframe template and UI patterns
 build/                      The /build skill
   SKILL.md
+constitution/               The /constitution skill
+  SKILL.md
+  references/               constitution template
 agents/
   build-reviewer.md         Independent adversarial reviewer used by /build
 ```
@@ -76,13 +83,32 @@ implementation works end to end by actually running it, attacks the weakest
 points, and returns a machine-readable verdict plus an ordered list of required
 changes. `build` spawns it fresh each round.
 
+### constitution
+
+Drafts or amends a project's constitution - a short set of non-negotiable
+principles that govern how the project is specified, planned, built and
+reviewed:
+
+1. Examine the project (existing `CLAUDE.md`, `README.md`, build files, source
+   layout) to build a picture before drafting.
+2. Confirm scope with a tight interview - fresh draft or amendment, how many
+   principles, any non-negotiables to capture verbatim.
+3. Draft declarative, testable principles from the template, one concern each,
+   with a short rationale where the reason is not obvious.
+4. Write the result into a single `## Constitution` section of the project's
+   `CLAUDE.md`, so it loads into every Claude Code session automatically.
+
+Because the constitution lives in `CLAUDE.md`, both `spec` (which runs a
+constitution check while planning) and `build` pick it up without any extra
+wiring.
+
 ## Installation (Claude Code)
 
-These are standard Claude Code skills. To use them, place the `spec` and `build`
-directories under a skills directory Claude Code reads - typically
-`~/.claude/skills/` for personal use or `.claude/skills/` within a project - and
-place `agents/build-reviewer.md` under the matching `agents/` directory so
-`build` can find its reviewer.
+These are standard Claude Code skills. To use them, place the `spec`, `build`
+and `constitution` directories under a skills directory Claude Code reads -
+typically `~/.claude/skills/` for personal use or `.claude/skills/` within a
+project - and place `agents/build-reviewer.md` under the matching `agents/`
+directory so `build` can find its reviewer.
 
 ## Usage
 
