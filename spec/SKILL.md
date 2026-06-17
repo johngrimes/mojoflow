@@ -128,17 +128,25 @@ exact file path`. `[P]` only for tasks on different files with no incomplete
 
 ### 8. Consistency check
 
-Do one automated pass over the artifacts and report (do not silently fix):
+Do one automated pass over the artifacts and fix every issue you find:
 
-- Every functional requirement maps to at least one task.
+- Every functional requirement maps to at least one task. Add any task that is
+  missing.
 - No task references an entity, contract, or screen the plan/spec never defines.
-- No contradiction between spec, plan, and tasks.
+  Either add the missing definition or correct the stray reference.
+- No contradiction between spec, plan, and tasks. Reconcile them to a single
+  consistent statement.
+
+Edit the relevant artifact in place, then re-run the pass and keep fixing until
+it comes back clean, so no fix introduces a fresh inconsistency. Only where a fix
+turns on a decision the grilling never settled (a genuine contradiction with no
+clearly correct side) stop and ask the user rather than guessing.
 
 ### 9. Report
 
 Tell the user the feature directory path, the files written, the
-requirements-checklist result, any consistency gaps found, and that they can
-proceed with `build`.
+requirements-checklist result, any consistency issues found and how you resolved
+them, and that they can proceed with `build`.
 
 ## Visibility
 
