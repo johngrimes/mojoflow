@@ -54,22 +54,39 @@ orchestrator's summary of it:
    genuinely cannot exercise it, say so explicitly and treat goal satisfaction
    as unverified - never assume it works.
 
-3. Attack the work, asking "how does this fail?" not "does this look fine?":
-   - **Specification**: is every functional requirement met and every acceptance
-     scenario demonstrably satisfied when actually run? Are the success criteria
-     achieved? Anything unmet, misinterpreted, or silently descoped?
-   - **Contracts**: does the implementation honour the interface contracts in
-     `plan.md`/`contracts/` exactly?
-   - **Tasks**: is every `tasks.md` item genuinely complete, not just checked
-     off?
-   - **Test-driven development**: is the behaviour actually covered by tests
-     that precede the implementation, and do they pass? Weak or missing tests
-     are a failure.
-   - **Correctness**: bugs, edge cases (including those in the spec), error
-     handling, broken invariants.
-   - **Prior feedback**: was each point genuinely fixed, or only superficially?
-   - **Quality**: clarity, simplicity, naming, consistency, dead code, scope
-     creep, and adherence to the user's CLAUDE.md conventions.
+3. Attack the work, asking "how does this fail?" not "does this look fine?".
+   Review across these focus areas:
+   - **Spec alignment**: is every functional requirement met and every
+     acceptance scenario demonstrably satisfied when actually run? Are the
+     success criteria achieved? Anything unmet, misinterpreted, or silently
+     descoped? Does the implementation honour the interface contracts in
+     `plan.md`/`contracts/` exactly, and is every `tasks.md` item genuinely
+     complete rather than just checked off?
+   - **Correctness**: bugs, edge cases (including those called out in the spec),
+     error handling, broken invariants. From round two onward, was each point of
+     prior feedback genuinely fixed or only superficially patched?
+   - **Performance and resource usage**: does it meet any stated performance
+     criteria? Look for needless work, N+1 patterns, unbounded memory or data
+     growth, blocking I/O on hot paths, leaks, and missing limits or
+     back-pressure under realistic load.
+   - **Architecture**: do the boundaries, responsibilities, and dependencies fit
+     the approach in `plan.md`? Watch for leaky abstractions, circular or
+     inverted dependencies, tight coupling, and state living in the wrong place.
+   - **Testing**: is the behaviour actually covered by tests that precede the
+     implementation, and do they pass? Are the meaningful edge cases and error
+     paths exercised, not just the happy path? Weak, missing, or tautological
+     tests are a failure.
+   - **Documentation**: are READMEs, API docs, usage examples, and inline
+     comments updated to match the change? Flag stale or absent documentation
+     where the code's intent is non-obvious.
+   - **Code quality**: clarity, precise naming, consistency, dead code, and
+     adherence to the user's CLAUDE.md conventions.
+   - **Simplicity**: is this the simplest solution that meets the requirement?
+     Hunt for unnecessary abstraction, premature generalisation, redundant
+     dependencies, and scope creep.
+   - **Maintainability**: could the next person understand and safely change
+     this? Watch for hidden coupling, magic values, duplicated logic, and
+     complexity that the requirement does not justify.
 4. Cite `path/to/file:line` for every finding and state concretely what is wrong
    and what would fix it. Flag uncertainty rather than asserting it.
 5. Do not move the goalposts: judge against the specification as written, not an
