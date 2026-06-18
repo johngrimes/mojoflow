@@ -21,10 +21,6 @@ A third skill, **`constitution`**, is a companion to the flow rather than a step
 in it: it drafts or amends a project's non-negotiable principles and writes them
 into `CLAUDE.md`, where `spec` and `build` then honour them.
 
-A fourth skill, **`goal`**, replicates Claude Code's `/goal` command: define
-explicit acceptance criteria, work towards them with a bounded
-self-review/repair loop, and report the outcome.
-
 ## What's here
 
 ```
@@ -37,9 +33,6 @@ build/                      The /build skill
 constitution/               The /constitution skill
   SKILL.md
   references/               constitution template
-goal/                       The /goal skill
-  SKILL.md
-  templates/                contract, review, and report templates
 agents/
   build-reviewer.md         Independent adversarial reviewer used by /build
 ```
@@ -133,31 +126,6 @@ Because the constitution lives in `CLAUDE.md`, both `spec` (which runs a
 constitution check while planning) and `build` pick it up without any extra
 wiring.
 
-### goal
-
-Works towards a goal until its acceptance criteria are met, with a bounded
-self-review/repair loop:
-
-1. **Clarify** the goal with a focused interview - one question at a time - until
-   the acceptance criteria are concrete and testable.
-2. Write a **goal contract** to `.local/goal/contract.md` with explicit criteria,
-   evidence plan, verification commands, stop rules, and round budget.
-3. **Implement** towards the goal, following test-driven development.
-4. **Self-review** against the contract, marking each criterion PASS or FAIL
-   with evidence references.
-5. **Repair** with minimal targeted fixes and re-verify; repeat until all
-   criteria pass or the round budget is exhausted.
-6. **Report** the verdict, per-criterion status, rounds run, and residual risks.
-
-The skill is self-contained: it owns its contract, review, and report templates
-and calls no external CLI or other skill. When delegation to a subagent is
-appropriate, the goal contract maps directly to pi's `acceptance` parameter on
-the `subagent()` tool, which provides a bounded self-review/repair loop natively.
-
-The concept draws on Claude Code's `/goal` command ("mantenha Claude trabalhando
-em direção a um objetivo até que uma condição seja atendida" - week 20, May 2026
-changelog) and the acceptance-contract pattern in pi's subagent system.
-
 ## Installation (Claude Code)
 
 These are standard Claude Code skills. Place the `spec`, `build` and
@@ -171,17 +139,11 @@ place `agents/build-reviewer.md` under the matching `agents/` directory so
 ```
 /spec <feature description>
 /build [spec-selector] [max-rounds]
-/goal <goal description>
 ```
 
 `spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`.
 `build` defaults to the latest spec when no selector is given, and to a cap of
 three review rounds.
-
-`goal` writes its contract and review artifacts under `<repo-root>/.local/goal/`.
-It clarifies the goal, writes an acceptance contract, implements, then loops
-through self-review and repair until all criteria are met or the round budget
-(default 3) is exhausted.
 
 ## Using with OpenCode
 
