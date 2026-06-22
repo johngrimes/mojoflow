@@ -28,7 +28,11 @@ Resolve the feature directory under `<repo-root>/.local/specs/`. If it has no
 `tasks.md`, stop and tell the user to run `spec` first. State the resolved
 feature directory and round cap back in one line before starting.
 
-This skill is git-neutral: it does not create branches, commit, or push.
+This skill commits as it goes. Each phase - or each cohesive group of tasks -
+lands as its own atomic commit once its tests pass, and every review round
+commits the fixes it makes, so by the time the loop ends the working tree is
+clean. It does not create branches or push to any remote; that stays with the
+user.
 
 ## Procedure
 
@@ -43,9 +47,12 @@ This skill is git-neutral: it does not create branches, commit, or push.
    **test-driven development**: for each behaviour write the test first, confirm
    it fails for the right reason, then implement until it passes. Mark each task
    `[X]` in `tasks.md` as it genuinely completes, and report progress per phase.
+   As each phase reaches a green state, commit it as an atomic unit (see
+   **Committing** below).
 
 3. **Run the mandatory checks.** Run the full build, test suite, and linter.
    Fix failures until all are green. Do not proceed to review with red checks.
+   Commit any fixes the full suite surfaced before moving on.
 
 4. **Spawn the reviewer.** Use the Agent tool with `subagent_type:
 build-reviewer`. Give it the feature directory path, a summary of what you
@@ -58,14 +65,36 @@ build-reviewer`. Give it the feature directory path, a summary of what you
 5. **Read the verdict line.** `VERDICT: SATISFIED` ends the loop (go to step 7);
    `VERDICT: NEEDS_WORK` continues to step 6.
 
-6. **Incorporate the feedback** in priority order, then return to step 3 -
-   unless you have hit the round cap, in which case stop.
+6. **Incorporate the feedback** in priority order, committing the round's fixes
+   once the checks are green again, then return to step 3 - unless you have hit
+   the round cap, in which case stop.
 
-7. **Report**: rounds run, final verdict, and what changed. The work is done
-   only when all three hold: the mandatory checks pass, every `tasks.md` item is
-   genuinely complete, and the reviewer returned `VERDICT: SATISFIED`. If you
-   stopped on the cap instead, say so and list the reviewer's outstanding
-   required changes.
+7. **Report**: rounds run, final verdict, what changed, and the commits made.
+   Whether the loop ends satisfied or on the cap, finish with a clean working
+   tree - everything committed. The work is _done_ only when all three hold: the
+   mandatory checks pass, every `tasks.md` item is genuinely complete, and the
+   reviewer returned `VERDICT: SATISFIED`. If you stopped on the cap instead, say
+   so and list the reviewer's outstanding required changes.
+
+## Committing
+
+Commit continuously so the history reads as a sequence of self-contained steps,
+not one large drop at the end.
+
+- **Commit atomic units.** Each commit is one coherent change that stands on its
+  own - typically a phase from `tasks.md`, or a cohesive group of tasks that
+  only make sense together. Keep independent changes in separate commits.
+- **Only commit green.** Commit a unit when it builds and its tests pass; never
+  commit a known-broken state. Under test-driven development this means a single
+  commit carries the new tests, the implementation that satisfies them, and the
+  matching `[X]` updates in `tasks.md`.
+- **Commit review fixes too.** Each review round commits the changes it makes
+  once the checks are green again (e.g. `Address review feedback: <summary>`).
+- **Message style.** Imperative mood, concise subject (around 50 characters),
+  body wrapped at 80 columns. No attribution footers.
+- **Finish clean.** When the loop ends - satisfied or capped - nothing is left
+  uncommitted; `git status` must be clean. Commit any stray change before
+  reporting.
 
 ## Visibility and guardrails
 

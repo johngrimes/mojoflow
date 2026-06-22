@@ -88,13 +88,18 @@ loop:
 1. Load the spec bundle and determine the project's build, test, and lint
    commands.
 2. Implement every phase in `tasks.md` order, following test-driven development,
-   marking each task done as it genuinely completes.
+   marking each task done as it genuinely completes and committing each phase as
+   an atomic unit once its tests pass.
 3. Run the full build, test suite, and linter until green.
 4. Spawn a fresh `build-reviewer` subagent that attacks the work against the
    spec.
 5. Read its verdict line: `SATISFIED` ends the loop; `NEEDS_WORK` continues.
 6. Incorporate the feedback and loop, up to the round cap (default 3).
 7. Report the rounds run, final verdict, and what changed.
+
+The skill commits as it goes - each phase and each review round lands as its own
+atomic commit - so the loop ends with a clean working tree. It does not create
+branches or push to any remote; that stays with you.
 
 Work is done only when the mandatory checks pass, every `tasks.md` item is
 genuinely complete, and the reviewer returns `VERDICT: SATISFIED`.
