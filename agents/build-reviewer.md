@@ -2,8 +2,8 @@
 name: build-reviewer
 description: Independent adversarial reviewer for the /build loop. Read-only. Judges an implementation against its full specification bundle and returns a verdict plus actionable feedback.
 tools: Bash, Read, Grep, Glob, Skill
-model: opus
-effort: high
+model: fable
+effort: medium
 permissionMode: auto
 ---
 
