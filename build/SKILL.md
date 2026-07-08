@@ -55,7 +55,9 @@ user.
    Commit any fixes the full suite surfaced before moving on.
 
 4. **Spawn the reviewer.** Use the Agent tool with `subagent_type:
-build-reviewer`. Give it the feature directory path, a summary of what you
+build-reviewer`, `model: fable`, and `effort: medium` (pass these explicitly so
+   the reviewer is not spawned on the parent's model and effort). Give it the
+   feature directory path, a summary of what you
    did this round, the files or diff to inspect, and - from round two onward -
    the feedback it gave last time so it can confirm each point was addressed.
    Spawn it fresh each round; reviewing your own work inline defeats the
