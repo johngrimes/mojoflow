@@ -1,7 +1,7 @@
 # MojoFlow
 
-A small set of three Claude Code skills for an agentic coding workflow, taking a
-feature from a rough idea to a finished, reviewed implementation:
+Three Claude Code skills for an agentic coding workflow, taking a feature from a
+rough idea to a finished, reviewed implementation:
 
 - **`spec`** - interview yourself to a shared understanding, then write a
   complete, self-contained specification bundle.
@@ -10,8 +10,8 @@ feature from a rough idea to a finished, reviewed implementation:
 - **`constitution`** - draft or amend a project's non-negotiable principles and
   write them into `CLAUDE.md`, where `spec` and `build` then honour them.
 
-The skills hand off cleanly. `spec` produces a feature directory under the
-project's `.local/specs/`, and `build` consumes it. `constitution` writes to
+The skills hand off cleanly. `spec` writes a feature directory under the
+project's `.local/specs/`, which `build` consumes. `constitution` writes to
 `CLAUDE.md`, which both `spec` (during its constitution check) and `build` pick
 up automatically.
 
@@ -23,24 +23,23 @@ project constitution - draws on GitHub's
 
 ## The workflow
 
-The three skills combine differently depending on where you are starting.
+The three skills combine differently depending on where you start.
 
 **A new project.** Lead with a `spec` for the first slice of work, so the shape
-of the thing becomes concrete. Once there is enough there to reason about, draft
-the `constitution` - the early spec gives you real material to ground the
-principles in, rather than guessing them up front. From then on the rhythm is
-`spec` → `build`, then `spec` → `build` again for the next feature, with the
-constitution steering both and amended whenever a new principle earns its place.
+of the thing becomes concrete. Once there is enough to reason about, draft the
+`constitution` - the early spec gives you real material to ground the principles
+in, rather than guessing them up front. From then on the rhythm is `spec` →
+`build`, repeated per feature, with the constitution steering both and amended
+whenever a new principle earns its place.
 
 **An existing project.** Start with the `constitution`. The code, docs and build
 files already encode how the project works, so the skill reads them and distils
-the principles that are already in force. With that in place, each new piece of
-work follows the same `spec` → `build` rhythm, now anchored to a constitution
-that reflects the project as it actually is.
+the principles already in force. Each new piece of work then follows the same
+`spec` → `build` rhythm, anchored to a constitution that reflects the project as
+it actually is.
 
-Either way, treat the constitution as a living document. As your understanding
-of the project's principles and constraints evolves - a new non-negotiable
-emerges, an old assumption stops holding - amend it so it keeps describing how
+Either way, treat the constitution as a living document. As a new non-negotiable
+emerges or an old assumption stops holding, amend it so it keeps describing how
 the project really works. `constitution` handles amendments as well as fresh
 drafts.
 
@@ -99,8 +98,7 @@ It follows that the resulting spec is written for the agent, not a human reader
 - a precise, machine-consumable record of the decisions reached, and the input
   `build` works from. There is little value in committing these specs: they are
   an artifact of a particular agent session, not source. They live under
-  `.local/`, which is ignored by Git globally, and stay out of version control
-  by design.
+  `.local/`, ignored by Git globally, and stay out of version control by design.
 
 The grilling idea comes from Matt Pocock's
 [Grill Me skill](https://www.aihero.dev/skills-grill-me).
@@ -138,9 +136,9 @@ returns a machine-readable verdict plus an ordered list of required changes.
 `build` spawns it fresh each round.
 
 The system prompt is identical across coding agents; only the frontmatter
-differs, since each agent has its own shape and model syntax. `agents/` therefore
-holds one definition per platform - `claude/`, `opencode/` and `pi/` - and you
-install whichever matches the agent you run.
+differs, since each agent has its own shape and model syntax. `agents/`
+therefore holds one definition per platform - `claude/`, `opencode/` and `pi/` -
+and you install whichever matches the agent you run.
 
 ### constitution
 
@@ -161,14 +159,6 @@ Because the constitution lives in `CLAUDE.md`, both `spec` (which runs a
 constitution check while planning) and `build` pick it up without any extra
 wiring.
 
-## Installation (Claude Code)
-
-These are standard Claude Code skills. Place the `spec`, `build` and
-`constitution` directories under a skills directory Claude Code reads - typically
-`~/.claude/skills/` for personal use or `.claude/skills/` within a project - and
-place `agents/claude/build-reviewer.md` under the matching `agents/` directory
-(`~/.claude/agents/` or `.claude/agents/`) so `build` can find its reviewer.
-
 ## Usage
 
 ```
@@ -180,84 +170,74 @@ place `agents/claude/build-reviewer.md` under the matching `agents/` directory
 `build` defaults to the latest spec when no selector is given, and to a cap of
 three review rounds.
 
-## Using with OpenCode
+## Installation
 
-[OpenCode](https://opencode.ai) reads the same `SKILL.md` format natively, so
-both skills run there with one adaptation for the reviewer agent.
+Each skill is a directory containing a `SKILL.md`; installing means placing it
+under a skills directory the coding agent scans. The `build` loop then spawns a
+`build-reviewer` subagent, whose definition differs per platform - install the
+one under `agents/` that matches the agent you run.
 
-### Install the skills
+### Claude Code
 
-OpenCode discovers skills by walking up from the working directory to the git
-root, scanning (among others) `.claude/skills/<name>/SKILL.md` and
-`~/.claude/skills/<name>/SKILL.md` - the same locations Claude Code uses. So if
-the skills are already installed for Claude Code, OpenCode finds them with no
-further work. Otherwise place them under one of OpenCode's own paths:
+Place the `spec`, `build` and `constitution` directories under a skills
+directory Claude Code reads - `.claude/skills/<name>/` in a project, or
+`~/.claude/skills/<name>/` globally. Claude Code loads discovered skills
+automatically, with no per-skill enable step.
 
-- Project: `.opencode/skills/spec/` and `.opencode/skills/build/`
-- Global: `~/.config/opencode/skills/spec/` and `~/.config/opencode/skills/build/`
+For the reviewer, place `agents/claude/build-reviewer.md` - already in Claude
+Code's agent shape, set to `fable` at medium effort - at
+`.claude/agents/build-reviewer.md` (project) or `~/.claude/agents/build-reviewer.md`
+(global).
 
-The `name` and `description` frontmatter both skills carry are the only required
-fields; the Claude-specific `argument-hint` is ignored by OpenCode.
+### OpenCode
 
-### Enable them
+[OpenCode](https://opencode.ai) discovers skills by walking up from the working
+directory to the git root, scanning (among others) the same
+`.claude/skills/<name>/SKILL.md` locations Claude Code uses - so skills already
+installed for Claude Code are found with no further work. Otherwise place them
+under `.opencode/skills/<name>/` (project) or
+`~/.config/opencode/skills/<name>/` (global).
 
-Skills are gated by pattern in `opencode.json`. Allow these two explicitly:
+Skills are gated by pattern in `opencode.json`. Allow them explicitly (values
+are `allow`, `deny`, or `ask`, and patterns support wildcards):
 
 ```json
 {
   "permission": {
     "skill": {
       "spec": "allow",
-      "build": "allow"
+      "build": "allow",
+      "constitution": "allow"
     }
   }
 }
 ```
 
-Values are `allow`, `deny`, or `ask`, and patterns support wildcards.
+For the reviewer, `agents/opencode/build-reviewer.md` carries the OpenCode shape
 
-### Install the reviewer agent
+- `mode: subagent`, a provider-prefixed `model`, a `reasoningEffort`, and a
+  `permission` block - with the same system prompt body. Place it at
+  `.opencode/agent/build-reviewer.md` (or
+  `~/.config/opencode/agent/build-reviewer.md`). It ships set to
+  `opencode-go/glm-5.2` at high effort; change `model` to whatever you run.
 
-The `build` loop spawns a `build-reviewer` subagent. Claude Code's agent
-frontmatter differs from OpenCode's, so `agents/opencode/build-reviewer.md`
-carries the OpenCode shape - `mode: subagent`, a provider-prefixed `model`, a
-`reasoningEffort`, and a `permission` block - with the same system prompt body.
-Place it at `.opencode/agent/build-reviewer.md` (or
-`~/.config/opencode/agent/build-reviewer.md`).
+### pi
 
-It ships set to `opencode-go/glm-5.2` at high effort; change `model` to whichever
-provider and model you run. OpenCode invokes subagents through its own task tool,
-so where `build` says "spawn the `build-reviewer` subagent", OpenCode dispatches
-to this agent by name - the loop behaves the same.
+[pi](https://pi.dev) discovers skills under its own paths - `.pi/skills/` or
+`.agents/skills/` in a project (and ancestors up to the git root), or
+`~/.pi/agent/skills/` or `~/.agents/skills/` globally. It loads discovered
+skills automatically, with no per-skill allow step.
 
-## Using with pi
+For the reviewer, pi discovers subagents from `.pi/agents/*.md` (project) or
+`~/.pi/agent/agents/*.md` (global), with project definitions winning on a name
+clash. Place `agents/pi/build-reviewer.md` - already in pi's agent shape, set to
+`opencode-go/glm-5.2` at high thinking - at one of those paths, changing `model`
+to whatever you run.
 
-[pi](https://pi.dev) reads the same `SKILL.md` format, so both skills run there
-with one adaptation for the reviewer agent.
-
-### Install the skills
-
-pi discovers skills under its own paths rather than the `.claude/` locations, so
-the skills need to sit somewhere it scans. Place the `spec`, `build` and
-`constitution` directories under one of:
-
-- Project: `.pi/skills/` or `.agents/skills/` (searched in the working directory
-  and its ancestors up to the git root)
-- Global: `~/.pi/agent/skills/` or `~/.agents/skills/`
-
-pi loads discovered skills automatically and advertises them to the model, so
-there is no per-skill allow step. The `name` and `description` frontmatter are the
-only fields pi requires; the Claude-specific `argument-hint` is ignored.
-
-### Install the reviewer agent
-
-pi discovers subagents from `.pi/agents/*.md` in a project or
-`~/.pi/agent/agents/*.md` globally, with project definitions winning on a name
-clash. Place the provided `agents/pi/build-reviewer.md` - already in pi's agent
-shape, set to `opencode-go/glm-5.2` at high thinking - at one of those paths.
-Change `model` to whichever provider and model you run. Where `build` says "spawn
-the `build-reviewer` subagent", pi dispatches to this agent by name and the loop
-behaves the same.
+On every platform the `name` and `description` frontmatter are the only required
+fields; the Claude-specific `argument-hint` is ignored elsewhere. Wherever
+`build` says "spawn the `build-reviewer` subagent", each platform dispatches to
+this agent by name and the loop behaves the same.
 
 ## Other workflows worth a look
 
