@@ -33,8 +33,10 @@ build/                      The /build skill
 constitution/               The /constitution skill
   SKILL.md
   references/               constitution template
-agents/
-  build-reviewer.md         Independent adversarial reviewer used by /build
+agents/                     The build-reviewer agent, one per coding agent
+  claude/build-reviewer.md    Claude Code (fable, medium effort)
+  opencode/build-reviewer.md  opencode (glm-5.2, high effort)
+  pi/build-reviewer.md        pi (glm-5.2, high effort)
 ```
 
 ## The skills
