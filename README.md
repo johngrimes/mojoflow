@@ -1,15 +1,19 @@
 # MojoFlow
 
-A small pair of Claude Code skills for an agentic coding workflow, taking a
-feature from a rough idea to a finished, reviewed implementation in two moves:
+A small set of three Claude Code skills for an agentic coding workflow, taking a
+feature from a rough idea to a finished, reviewed implementation:
 
-1. **`spec`** - interview yourself to a shared understanding, then write a
-   complete, self-contained specification bundle.
-2. **`build`** - implement that bundle, then run an adversarial build-and-review
-   loop until an independent reviewer is satisfied.
+- **`spec`** - interview yourself to a shared understanding, then write a
+  complete, self-contained specification bundle.
+- **`build`** - implement that bundle, then run an adversarial build-and-review
+  loop until an independent reviewer is satisfied.
+- **`constitution`** - draft or amend a project's non-negotiable principles and
+  write them into `CLAUDE.md`, where `spec` and `build` then honour them.
 
-The two skills hand off cleanly: `spec` produces a feature directory under the
-project's `.local/specs/`, and `build` consumes it.
+The skills hand off cleanly. `spec` produces a feature directory under the
+project's `.local/specs/`, and `build` consumes it. `constitution` writes to
+`CLAUDE.md`, which both `spec` (during its constitution check) and `build` pick
+up automatically.
 
 The overall shape - the spec → plan → tasks progression, the artifact set
 (`spec.md`, `plan.md`, `tasks.md`, `research.md`, `data-model.md`, `contracts/`,
@@ -17,9 +21,28 @@ The overall shape - the spec → plan → tasks progression, the artifact set
 project constitution - draws on GitHub's
 [spec-kit](https://github.com/github/spec-kit).
 
-A third skill, **`constitution`**, is a companion to the flow rather than a step
-in it: it drafts or amends a project's non-negotiable principles and writes them
-into `CLAUDE.md`, where `spec` and `build` then honour them.
+## The workflow
+
+The three skills combine differently depending on where you are starting.
+
+**A new project.** Lead with a `spec` for the first slice of work, so the shape
+of the thing becomes concrete. Once there is enough there to reason about, draft
+the `constitution` - the early spec gives you real material to ground the
+principles in, rather than guessing them up front. From then on the rhythm is
+`spec` → `build`, then `spec` → `build` again for the next feature, with the
+constitution steering both and amended whenever a new principle earns its place.
+
+**An existing project.** Start with the `constitution`. The code, docs and build
+files already encode how the project works, so the skill reads them and distils
+the principles that are already in force. With that in place, each new piece of
+work follows the same `spec` → `build` rhythm, now anchored to a constitution
+that reflects the project as it actually is.
+
+Either way, treat the constitution as a living document. As your understanding
+of the project's principles and constraints evolves - a new non-negotiable
+emerges, an old assumption stops holding - amend it so it keeps describing how
+the project really works. `constitution` handles amendments as well as fresh
+drafts.
 
 ## What's here
 
