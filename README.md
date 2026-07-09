@@ -114,6 +114,11 @@ implementation works end to end by running it, attacks the weakest points, and
 returns a machine-readable verdict plus an ordered list of required changes.
 `build` spawns it fresh each round.
 
+The system prompt is identical across coding agents; only the frontmatter
+differs, since each agent has its own shape and model syntax. `agents/` therefore
+holds one definition per platform - `claude/`, `opencode/` and `pi/` - and you
+install whichever matches the agent you run.
+
 ### constitution
 
 Drafts or amends a project's constitution - a short set of non-negotiable
@@ -138,8 +143,8 @@ wiring.
 These are standard Claude Code skills. Place the `spec`, `build` and
 `constitution` directories under a skills directory Claude Code reads - typically
 `~/.claude/skills/` for personal use or `.claude/skills/` within a project - and
-place `agents/build-reviewer.md` under the matching `agents/` directory so
-`build` can find its reviewer.
+place `agents/claude/build-reviewer.md` under the matching `agents/` directory
+(`~/.claude/agents/` or `.claude/agents/`) so `build` can find its reviewer.
 
 ## Usage
 
@@ -188,31 +193,48 @@ Skills are gated by pattern in `opencode.json`. Allow these two explicitly:
 
 Values are `allow`, `deny`, or `ask`, and patterns support wildcards.
 
-### Adapt the reviewer agent
+### Install the reviewer agent
 
-The `build` loop spawns a `build-reviewer` subagent. The provided
-`agents/build-reviewer.md` uses Claude Code's agent frontmatter, which OpenCode
-does not read. Create an OpenCode subagent at `.opencode/agent/build-reviewer.md`
-(or `~/.config/opencode/agent/build-reviewer.md`) with the OpenCode shape -
-`mode: subagent`, a provider-prefixed `model`, and a `permission` block -
-keeping the original system prompt body:
+The `build` loop spawns a `build-reviewer` subagent. Claude Code's agent
+frontmatter differs from OpenCode's, so `agents/opencode/build-reviewer.md`
+carries the OpenCode shape - `mode: subagent`, a provider-prefixed `model`, a
+`reasoningEffort`, and a `permission` block - with the same system prompt body.
+Place it at `.opencode/agent/build-reviewer.md` (or
+`~/.config/opencode/agent/build-reviewer.md`).
 
-```markdown
----
-description: Independent adversarial reviewer for the build loop. Read-only. Judges an implementation against its full specification bundle and returns a verdict plus actionable feedback.
-mode: subagent
-model: opencode-go/kimi-k2.6
-permission:
-  edit: deny
-  bash: allow
----
+It ships set to `opencode-go/glm-5.2` at high effort; change `model` to whichever
+provider and model you run. OpenCode invokes subagents through its own task tool,
+so where `build` says "spawn the `build-reviewer` subagent", OpenCode dispatches
+to this agent by name - the loop behaves the same.
 
-(paste the system prompt body from agents/build-reviewer.md here)
-```
+## Using with pi
 
-Set `model` to whichever provider and model you run. OpenCode invokes subagents
-through its own task tool, so where `build` says "spawn the `build-reviewer`
-subagent", OpenCode dispatches to this agent by name - the loop behaves the same.
+[pi](https://pi.dev) reads the same `SKILL.md` format, so both skills run there
+with one adaptation for the reviewer agent.
+
+### Install the skills
+
+pi discovers skills under its own paths rather than the `.claude/` locations, so
+the skills need to sit somewhere it scans. Place the `spec`, `build` and
+`constitution` directories under one of:
+
+- Project: `.pi/skills/` or `.agents/skills/` (searched in the working directory
+  and its ancestors up to the git root)
+- Global: `~/.pi/agent/skills/` or `~/.agents/skills/`
+
+pi loads discovered skills automatically and advertises them to the model, so
+there is no per-skill allow step. The `name` and `description` frontmatter are the
+only fields pi requires; the Claude-specific `argument-hint` is ignored.
+
+### Install the reviewer agent
+
+pi discovers subagents from `.pi/agents/*.md` in a project or
+`~/.pi/agent/agents/*.md` globally, with project definitions winning on a name
+clash. Place the provided `agents/pi/build-reviewer.md` - already in pi's agent
+shape, set to `opencode-go/glm-5.2` at high thinking - at one of those paths.
+Change `model` to whichever provider and model you run. Where `build` says "spawn
+the `build-reviewer` subagent", pi dispatches to this agent by name and the loop
+behaves the same.
 
 ## Other workflows worth a look
 
