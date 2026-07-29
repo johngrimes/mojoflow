@@ -2,6 +2,8 @@
 name: spec
 description: Turn a feature idea into a complete, self-contained specification - interview the user to shared understanding, then generate spec, plan, and an executable task breakdown into a per-project specs directory. Use when the user wants to spec a feature, write a spec, or mentions "/spec".
 argument-hint: "<feature description>"
+model: opus
+effort: xhigh
 ---
 
 You produce a complete specification for a feature: you interview the user to
