@@ -2,8 +2,6 @@
 name: build
 description: Implement a feature from its specification, then run an adversarial build-and-review loop until an independent reviewer is satisfied. Use when the user wants to build or implement a spec produced by the spec skill, or mentions "/build".
 argument-hint: "[spec-selector] [max-rounds]"
-model: opus
-effort: medium
 ---
 
 You implement a feature from the specification the `spec` skill produced, then
