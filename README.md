@@ -131,12 +131,11 @@ and gives no signal about which parts were actually absorbed. The interview
 replaces that with a focused exchange: one question at a time, each forcing a
 concrete decision, until nothing material is left unresolved.
 
-It follows that the resulting spec is written for the agent, not a human reader
-
-- a precise, machine-consumable record of the decisions reached, and the input
-  `build` works from. There is little value in committing these specs: they are
-  an artifact of a particular agent session, not source. They live under
-  `.local/`, ignored by Git globally, and stay out of version control by design.
+It follows that the resulting spec is written for the agent, not a human
+reader - a precise, machine-consumable record of the decisions reached, and the
+input `build` works from. There is little value in committing these specs: they
+are an artifact of a particular agent session, not source. They live under
+`.local/`, ignored by Git globally, and stay out of version control by design.
 
 The grilling idea comes from Matt Pocock's
 [Grill Me skill](https://www.aihero.dev/skills-grill-me).
