@@ -54,14 +54,14 @@ user.
    Fix failures until all are green. Do not proceed to review with red checks.
    Commit any fixes the full suite surfaced before moving on.
 
-4. **Spawn the reviewer.** Use the Agent tool with `subagent_type:
-   build-reviewer`. Its model and effort are set in its own frontmatter, so do
-   not override them here. Give it the feature directory path, a summary of what
-   you did this round, the files or diff to inspect, and - from round two onward -
-   the feedback it gave last time so it can confirm each point was addressed.
-   Spawn it fresh each round; reviewing your own work inline defeats the
-   mechanism. Present the work plainly - do not pre-defend it or steer it toward
-   a pass.
+4. **Spawn the reviewer.** Use the Agent tool with
+   `subagent_type: build-reviewer`. Its model and effort are set in its own
+   frontmatter, so do not override them here. Give it the feature directory
+   path, a summary of what you did this round, the files or diff to inspect,
+   and - from round two onward - the feedback it gave last time so it can
+   confirm each point was addressed. Spawn it fresh each round; reviewing your
+   own work inline defeats the mechanism. Present the work plainly - do not
+   pre-defend it or steer it toward a pass.
 
 5. **Read the verdict line.** `VERDICT: SATISFIED` ends the loop (go to step 7);
    `VERDICT: NEEDS_WORK` continues to step 6.
