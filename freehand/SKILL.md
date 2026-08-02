@@ -44,7 +44,9 @@ files) and its `CLAUDE.md`. Anything discoverable on disk is not a question.
 ### 2. Grill: requirements only
 
 Interview the user about **what to build**, one question at a time, each with
-your recommended answer.
+your recommended answer. Ask, wait for the reply, then work out what to ask
+next - never batch several questions into one message. The order matters: an
+answer often removes the need for a question you were about to ask.
 
 The default for an open question is to **decide it yourself**, not to ask. Ask
 only when the answer would materially change what gets built and you cannot
