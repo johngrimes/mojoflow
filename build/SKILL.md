@@ -1,6 +1,6 @@
 ---
 name: build
-description: Implement one phase of a feature's specification, then run an adversarial build-and-review loop until an independent reviewer is satisfied. Use when the user wants to build or implement a spec produced by the spec skill, or mentions "/build".
+description: Implement a feature's specification one phase per invocation, then - once the final phase lands - run an adversarial build-and-review loop until an independent reviewer is satisfied. Use when the user wants to build or implement a spec produced by the spec skill, or mentions "/build".
 argument-hint: "[spec-selector] [max-rounds]"
 ---
 
@@ -10,10 +10,15 @@ subagent attacks the work against the spec, you incorporate its feedback - round
 after round - until it is satisfied or the round cap is hit.
 
 Where `tasks.md` has more than one phase, an invocation builds **one phase** -
-the next one with unfinished tasks - reviews it, and stops. The user runs the
-skill again to take the next phase. This keeps each review round scoped to an
-increment the reviewer can actually attack in depth, and gives the user a
-checkpoint between phases rather than one large drop at the end.
+the next one with unfinished tasks - and stops. The user runs the skill again to
+take the next phase, which gives them a checkpoint between phases rather than
+one large drop at the end.
+
+The review loop runs **once**, on the invocation that completes the final phase,
+with the whole feature in front of the reviewer. The spec's acceptance scenarios
+and success criteria describe a finished feature, and a partly built one cannot
+demonstrate them; a reviewer sent in early would be judging against a contract
+the work is not yet meant to satisfy.
 
 The review is deliberately adversarial. The reviewer tries to prove the
 implementation does not meet the spec; your job is to leave it nothing to find.
@@ -28,7 +33,8 @@ Parse `$ARGUMENTS`:
   the highest-numbered directory under `<repo-root>/.local/specs/`.
 - **Max rounds**: default **3**. Only override when the user explicitly asks
   (e.g. "up to 5 rounds"); do not treat a positional integer as the cap, since
-  the spec selector may itself be a number.
+  the spec selector may itself be a number. It applies only to the invocation
+  that reaches the review loop.
 - **Phase**: default to the **next phase in `tasks.md` with unfinished tasks**.
   Only build a different phase when the user names one in words (e.g. "build
   phase 4"); as with the round cap, do not read a positional integer as a phase
@@ -37,13 +43,14 @@ Parse `$ARGUMENTS`:
 Resolve the feature directory under `<repo-root>/.local/specs/`. If it has no
 `tasks.md`, stop and tell the user to run `spec` first. State the resolved
 feature directory, the phase you are about to build, how many phases remain
-after it, and the round cap back in one line before starting.
+after it, and - where this is the last one - the round cap, back in one line
+before starting.
 
 This skill commits as it goes. The phase - or each cohesive group of tasks
 within it - lands as its own atomic commit once its tests pass, and every review
-round commits the fixes it makes, so by the time the loop ends the working tree
-is clean. It does not create branches or push to any remote; that stays with the
-user.
+round commits the fixes it makes, so every invocation ends with a clean working
+tree, whether it stops at a phase boundary or at the end of the review loop. It
+does not create branches or push to any remote; that stays with the user.
 
 ## Procedure
 
@@ -56,8 +63,9 @@ user.
 2. **Resolve the phase.** Take the first phase in `tasks.md` order that still
    has `[ ]` tasks, unless the user named one. An unfinished task in an earlier
    phase means that earlier phase is the one to build - do not skip ahead to a
-   later one. If every task is already `[X]`, say the feature is complete and
-   stop.
+   later one. If every task is already `[X]` there is nothing left to build, so
+   go straight to step 4: a feature whose last phase landed in an invocation
+   that was interrupted still owes the user its review.
 
 3. **Implement that phase, and only that phase.** Work in `tasks.md` order
    within it, respecting dependencies and `[P]` parallel markers, tasks on the
@@ -70,35 +78,40 @@ user.
    genuine prerequisite, note it in the report rather than absorbing it.
 
 4. **Run the mandatory checks.** Run the full build, test suite, and linter.
-   Fix failures until all are green. Do not proceed to review with red checks.
-   Commit any fixes the full suite surfaced before moving on.
+   Fix failures until all are green. An invocation never ends on red checks and
+   the review never starts on them. Commit any fixes the full suite surfaced
+   before moving on.
 
-5. **Spawn the reviewer.** Use the Agent tool with
+5. **Stop here if any phase remains.** With work still outstanding in
+   `tasks.md`, report the phase built, what changed, the commits made, and the
+   phases still to come, then stop without spawning the reviewer. Leave a clean
+   working tree. Only when every task in `tasks.md` is `[X]` do you continue to
+   step 6.
+
+6. **Spawn the reviewer.** Use the Agent tool with
    `subagent_type: build-reviewer`. Its model and effort are set in its own
-   frontmatter, so do not override them here. Give it the feature directory
-   path, the phase under review and its task IDs, a summary of what you did this
-   round, the files or diff to inspect, and - from round two onward - the
-   feedback it gave last time so it can confirm each point was addressed. State
-   plainly that later phases are unbuilt and out of scope for this round. Spawn
-   it fresh each round; reviewing your own work inline defeats the mechanism.
-   Present the work plainly - do not pre-defend it or steer it toward a pass.
+   frontmatter, so do not override them here. The whole feature is under review,
+   not just the phase you just finished: give it the feature directory path, a
+   summary of the work across every phase, the full diff for the feature (which
+   may span several invocations and many commits), and - from round two onward -
+   the feedback it gave last time so it can confirm each point was addressed.
+   Spawn it fresh each round; reviewing your own work inline defeats the
+   mechanism. Present the work plainly - do not pre-defend it or steer it toward
+   a pass.
 
-6. **Read the verdict line.** `VERDICT: SATISFIED` ends the loop (go to step 8);
-   `VERDICT: NEEDS_WORK` continues to step 7.
+7. **Read the verdict line.** `VERDICT: SATISFIED` ends the loop (go to step 9);
+   `VERDICT: NEEDS_WORK` continues to step 8.
 
-7. **Incorporate the feedback** in priority order, committing the round's fixes
-   once the checks are green again, then return to step 4 - unless you have hit
-   the round cap, in which case stop.
+8. **Incorporate the feedback** in priority order, re-run the mandatory checks
+   until green and commit the round's fixes, then return to step 6 - unless you
+   have hit the round cap, in which case stop.
 
-8. **Report**: the phase built, rounds run, final verdict, what changed, and the
-   commits made. Name the phases still outstanding and say that running the
-   skill again picks up the next one; if this was the last phase, say the
-   feature is complete instead. Whether the loop ends satisfied or on the cap,
-   finish with a clean working tree - everything committed. The phase is _done_
-   only when all three hold: the mandatory checks pass, every task in that phase
-   is genuinely complete, and the reviewer returned `VERDICT: SATISFIED`. If you
-   stopped on the cap instead, say so and list the reviewer's outstanding
-   required changes.
+9. **Report**: rounds run, final verdict, what changed, and the commits made.
+   Whether the loop ends satisfied or on the cap, finish with a clean working
+   tree - everything committed. The work is _done_ only when all three hold: the
+   mandatory checks pass, every `tasks.md` item is genuinely complete, and the
+   reviewer returned `VERDICT: SATISFIED`. If you stopped on the cap instead, say
+   so and list the reviewer's outstanding required changes.
 
 ## Committing
 
@@ -123,11 +136,15 @@ not one large drop at the end.
 
 ## Visibility and guardrails
 
-- Announce each round before sending it ("Round 2 of 3 - sending to reviewer")
-  and report each verdict in one line.
+- Announce the phase and how many remain as you start, and - in the invocation
+  that reaches the review - announce each round before sending it ("Round 2 of
+  3 - sending to reviewer") and report each verdict in one line.
 - One phase per invocation is as hard a limit as the round cap. Stop once the
-  phase is reviewed - do not roll on into the next one because the checks are
-  green, the phase was small, or the remaining work looks obvious.
+  phase is green and committed - do not roll on into the next one because the
+  phase was small or the remaining work looks obvious.
+- The review is neither early nor optional. Do not spawn the reviewer while any
+  `tasks.md` item is unfinished, and do not end the invocation that completes
+  the last phase without running the loop.
 - The cap is a hard limit. The loop ends as satisfied only when the reviewer
   itself returns `VERDICT: SATISFIED` - never declare success on its behalf.
 - If two consecutive rounds make no real progress on the same findings, stop
