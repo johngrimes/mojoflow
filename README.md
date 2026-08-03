@@ -5,8 +5,9 @@ rough idea to a finished, reviewed implementation:
 
 - **`spec`** - interview yourself to a shared understanding, then write a
   complete, self-contained specification bundle.
-- **`build`** - implement that bundle, then run an adversarial build-and-review
-  loop until an independent reviewer is satisfied.
+- **`build`** - implement that bundle a phase at a time, each phase closing with
+  an adversarial build-and-review loop that runs until an independent reviewer
+  is satisfied.
 - **`freehand`** - skip the specification and build straight from a prompt, with
   the same adversarial review at the end.
 - **`constitution`** - draft or amend a project's non-negotiable principles and
@@ -33,10 +34,10 @@ writing.
 
 **`spec` → `build`** is the considered route. The interview walks the
 requirements, the screens and the technical approach, and leaves a bundle on
-disk that `build` then implements task by task. Reach for it when the feature is
-large or touches several parts of the system, when the requirements are
-genuinely unsettled, or when you want the decisions written down and reviewable
-before any code exists.
+disk that `build` then implements a phase at a time. Reach for it when the
+feature is large or touches several parts of the system, when the requirements
+are genuinely unsettled, or when you want the decisions written down and
+reviewable before any code exists.
 
 **`freehand`** is the direct route. It reads the codebase, asks only what it
 cannot work out for itself, decides the rest and tells you what it decided, then
@@ -45,7 +46,8 @@ thing is already clear in your head and a specification bundle would be ceremony
 around a decision you have already made.
 
 Both routes end the same way, in an adversarial review loop that runs until an
-independent reviewer is satisfied. The rigour lives in the review either way -
+independent reviewer is satisfied - `build` at the close of every phase,
+`freehand` once at the end. The rigour lives in the review either way -
 `freehand` gives up the specification, not the standard.
 
 If you pick wrong, the cost is small in one direction and not the other. Running
@@ -143,26 +145,41 @@ The grilling idea comes from Matt Pocock's
 ### build
 
 Implements a feature from the `spec` bundle, then runs an adversarial review
-loop:
+loop. Where `tasks.md` has more than one phase, an invocation builds **one
+phase** and stops; you run it again to take the next:
 
 1. Load the spec bundle and determine the project's build, test, and lint
    commands.
-2. Implement every phase in `tasks.md` order, following test-driven development,
-   marking each task done as it genuinely completes and committing each phase as
-   an atomic unit once its tests pass.
-3. Run the full build, test suite, and linter until green.
-4. Spawn a fresh `build-reviewer` subagent that attacks the work against the
+2. Resolve the phase to build - the next one in `tasks.md` with unfinished
+   tasks.
+3. Implement that phase and no other, following test-driven development, marking
+   each task done as it genuinely completes and committing as the work reaches a
+   green state.
+4. Run the full build, test suite, and linter until green.
+5. Spawn a fresh `build-reviewer` subagent that attacks the phase against the
    spec.
-5. Read its verdict line: `SATISFIED` ends the loop; `NEEDS_WORK` continues.
-6. Incorporate the feedback and loop, up to the round cap (default 3).
-7. Report the rounds run, final verdict, and what changed.
+6. Read its verdict line: `SATISFIED` ends the loop; `NEEDS_WORK` continues.
+7. Incorporate the feedback and loop, up to the round cap (default 3).
+8. Report the phase built, the rounds run, the final verdict, what changed, and
+   the phases still outstanding.
 
-The skill commits as it goes - each phase and each review round lands as its own
-atomic commit - so the loop ends with a clean working tree. It does not create
+The skill commits as it goes - the phase and each review round land as their own
+atomic commits - so the loop ends with a clean working tree. It does not create
 branches or push to any remote; that stays with you.
 
-Work is done only when the mandatory checks pass, every `tasks.md` item is
+A phase is done only when the mandatory checks pass, every task in it is
 genuinely complete, and the reviewer returns `VERDICT: SATISFIED`.
+
+#### Why one phase at a time
+
+A whole feature is more than a reviewer can attack in depth in a single pass.
+The diff is large, the round cap gets spent on the loudest findings, and the
+quieter ones ride through underneath them. A phase is small enough to be run,
+exercised and genuinely picked apart within the cap.
+
+It is also where you get a say. Each invocation ends at a reviewed, committed
+increment you can inspect - and correct, or redirect - before any of the next
+phase is written on top of it.
 
 ### freehand
 
@@ -213,8 +230,10 @@ points, and returns a machine-readable verdict plus an ordered list of required
 changes. The skill spawns it fresh each round.
 
 There are two, because they judge against different contracts: `build-reviewer`
-reads a specification bundle from disk, while `freehand-reviewer` is handed a
-transcript and has to weigh declared assumptions and test skips along with it.
+reads a specification bundle from disk and judges the one phase under review,
+treating later phases as legitimately unbuilt, while `freehand-reviewer` is
+handed a transcript and has to weigh declared assumptions and test skips along
+with it.
 Everything else - the adversarial stance, the mandatory prove-it-works step, the
 focus areas, the verdict format - is the same by design, and duplicated rather
 than shared. Nothing keeps the copies in step, so a change to a passage in one
@@ -253,7 +272,9 @@ wiring.
 ```
 
 `spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`.
-`build` defaults to the latest spec when no selector is given. `freehand` takes
+`build` defaults to the latest spec when no selector is given, and within it to
+the next phase with unfinished tasks; name a different phase in words ("build
+phase 4") to override that. `freehand` takes
 its whole argument as the prompt and writes nothing to disk. Both default to a
 cap of three review rounds, changed by asking in words ("up to 5 rounds").
 
