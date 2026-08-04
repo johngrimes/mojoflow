@@ -5,74 +5,59 @@ rough idea to a finished, reviewed implementation:
 
 - **`spec`** - interview yourself to a shared understanding, then write a
   complete, self-contained specification bundle.
-- **`build`** - implement that bundle a phase at a time, then close with an
-  adversarial build-and-review loop that runs until an independent reviewer is
-  satisfied.
+- **`build`** - implement that bundle a phase at a time, closing with an
+  adversarial review loop that runs until an independent reviewer is satisfied.
 - **`freehand`** - skip the specification and build straight from a prompt, with
-  the same adversarial review at the end.
-- **`constitution`** - draft or amend a project's non-negotiable principles and
-  write them into `CLAUDE.md`, where the building skills then honour them.
+  the same review at the end.
+- **`constitution`** - draft or amend a project's non-negotiable principles in
+  `CLAUDE.md`, where the building skills then honour them.
 
-The skills hand off cleanly. `spec` writes a feature directory under the
-project's `.local/specs/`, which `build` consumes. `freehand` writes nothing to
-disk and hands off to nothing - it is that whole route in a single command.
-`constitution` writes to `CLAUDE.md`, which `spec` (during its constitution
-check), `build` and `freehand` all pick up automatically.
+They hand off cleanly. `spec` writes a feature directory under the project's
+`.local/specs/`, which `build` consumes. `freehand` writes nothing to disk and
+hands off to nothing. `constitution` writes to `CLAUDE.md`, which the other
+three pick up automatically.
 
-The overall shape - the spec → plan → tasks progression, the artifact set
-(`spec.md`, `plan.md`, `tasks.md`, `research.md`, `data-model.md`, `contracts/`,
-`quickstart.md`), the sequential `NNN-short-name` feature directories, and the
-project constitution - draws on GitHub's
-[spec-kit](https://github.com/github/spec-kit).
+The overall shape - the spec → plan → tasks progression, the artifact set, the
+sequential `NNN-short-name` feature directories, and the project constitution -
+draws on GitHub's [spec-kit](https://github.com/github/spec-kit).
 
 ## The workflow
 
 ### Two routes to an implementation
 
-The choice between them is about how much needs settling before code is worth
-writing.
+The choice is about how much needs settling before code is worth writing.
 
 **`spec` → `build`** is the considered route. The interview walks the
 requirements, the screens and the technical approach, and leaves a bundle on
-disk that `build` then implements a phase at a time. Reach for it when the
-feature is large or touches several parts of the system, when the requirements
-are genuinely unsettled, or when you want the decisions written down and
-reviewable before any code exists.
+disk that `build` implements a phase at a time. Reach for it when the feature is
+large, when the requirements are genuinely unsettled, or when you want the
+decisions reviewable before any code exists.
 
 **`freehand`** is the direct route. It reads the codebase, asks only what it
 cannot work out for itself, decides the rest and tells you what it decided, then
-builds. Nothing lands on disk but the code. Reach for it when the shape of the
-thing is already clear in your head and a specification bundle would be ceremony
-around a decision you have already made.
+builds. Reach for it when the shape of the thing is already clear in your head.
 
-Both routes end the same way, in an adversarial review loop that runs until an
-independent reviewer is satisfied. The rigour lives in the review either way -
-`freehand` gives up the specification, not the standard.
+Both routes end in an adversarial review loop that runs until an independent
+reviewer is satisfied. `freehand` gives up the specification, not the standard.
 
-If you pick wrong, the cost is small in one direction and not the other. Running
-`freehand` on something that turns out to be large leaves you with code but no
-record of why it is shaped that way; running `spec` on something small costs
-only the interview. When genuinely torn, `spec` is the cheaper mistake.
+The cost of picking wrong is asymmetric. `freehand` on something that turns out
+to be large leaves you with code but no record of why it is shaped that way;
+`spec` on something small costs only the interview. When torn, `spec` is the
+cheaper mistake.
 
 ### Where to start
 
 **A new project.** Lead with a `spec` for the first slice of work, so the shape
-of the thing becomes concrete. Once there is enough to reason about, draft the
-`constitution` - the early spec gives you real material to ground the principles
-in, rather than guessing them up front. From then on the rhythm is a route per
-feature, with the constitution steering whichever one you take and amended
-whenever a new principle earns its place.
+of the thing becomes concrete. Then draft the `constitution` - the early spec
+gives you real material to ground the principles in, rather than guessing them
+up front. From then on, a route per feature.
 
 **An existing project.** Start with the `constitution`. The code, docs and build
 files already encode how the project works, so the skill reads them and distils
-the principles already in force. Each new piece of work then takes whichever
-route suits it, anchored to a constitution that reflects the project as it
-actually is.
+the principles already in force.
 
-Either way, treat the constitution as a living document. As a new non-negotiable
-emerges or an old assumption stops holding, amend it so it keeps describing how
-the project really works. `constitution` handles amendments as well as fresh
-drafts.
+Either way, treat the constitution as a living document, amended as a new
+non-negotiable emerges or an old assumption stops holding.
 
 ## What's here
 
@@ -90,15 +75,12 @@ constitution/               The /constitution skill
   references/               constitution template
 agents/                     The reviewer agents, one pair per coding agent
   claude/                     Claude Code (fable, medium effort)
-    build-reviewer.md
-    freehand-reviewer.md
   opencode/                   opencode (glm-5.2, high effort)
-    build-reviewer.md
-    freehand-reviewer.md
   pi/                         pi (glm-5.2, high effort)
-    build-reviewer.md
-    freehand-reviewer.md
 ```
+
+Each `agents/` subdirectory holds a `build-reviewer.md` and a
+`freehand-reviewer.md`.
 
 ## The skills
 
@@ -119,7 +101,7 @@ approval gates:
 6. Write `plan.md` with a constitution check, plus `research.md`,
    `data-model.md`, `contracts/`, and `quickstart.md` where relevant.
 7. Write a dependency-ordered, test-first `tasks.md`.
-8. Run a consistency check across the artifacts, fixing any issues it surfaces.
+8. Run a consistency check across the artifacts, fixing what it surfaces.
 
 The skill is self-contained: it owns its templates and wireframing assets and
 calls no external CLI or other skill.
@@ -130,13 +112,13 @@ Reading a large specification is an unreliable way to build shared
 understanding. A long document invites skimming, lets ambiguity hide in prose,
 and gives no signal about which parts were actually absorbed. The interview
 replaces that with a focused exchange: one question at a time, each forcing a
-concrete decision, until nothing material is left unresolved.
+concrete decision.
 
 It follows that the resulting spec is written for the agent, not a human
-reader - a precise, machine-consumable record of the decisions reached, and the
-input `build` works from. There is little value in committing these specs: they
-are an artifact of a particular agent session, not source. They live under
-`.local/`, ignored by Git globally, and stay out of version control by design.
+reader - a machine-consumable record of the decisions reached, and the input
+`build` works from. These specs are an artifact of a particular agent session,
+not source, so they live under `.local/`, ignored by Git globally, and stay out
+of version control by design.
 
 The grilling idea comes from Matt Pocock's
 [Grill Me skill](https://www.aihero.dev/skills-grill-me).
@@ -160,13 +142,13 @@ the last one lands:
    come. Only a finished `tasks.md` goes on to the review.
 6. Spawn a fresh `build-reviewer` subagent that attacks the whole feature -
    every phase, not just the last - against the spec.
-7. Read its verdict line: `SATISFIED` ends the loop; `NEEDS_WORK` continues.
-8. Incorporate the feedback and loop, up to the round cap (default 3).
-9. Report the rounds run, final verdict, and what changed.
+7. Read its verdict line (`SATISFIED` ends the loop, `NEEDS_WORK` continues),
+   incorporate the feedback and loop, up to the round cap (default 3).
+8. Report the rounds run, final verdict, and what changed.
 
-The skill commits as it goes - each phase and each review round land as their
-own atomic commits - so every invocation ends with a clean working tree. It does
-not create branches or push to any remote; that stays with you.
+Each phase and each review round land as their own atomic commits, so every
+invocation ends with a clean working tree. The skill creates no branches and
+pushes nothing.
 
 Work is done only when the mandatory checks pass, every `tasks.md` item is
 genuinely complete, and the reviewer returns `VERDICT: SATISFIED`.
@@ -179,9 +161,18 @@ phase is written on top of it, instead of one large drop at the end.
 
 The review waits for the whole feature because that is what the specification
 describes. Acceptance scenarios and success criteria are written about a
-finished feature, and a reviewer sent in at a phase boundary would be judging
-work against a contract it is not yet meant to satisfy - manufacturing findings
-for things the next phase was always going to add.
+finished feature, so a reviewer sent in at a phase boundary would judge work
+against a contract it is not yet meant to satisfy, manufacturing findings for
+things the next phase was always going to add.
+
+#### Driving a multi-phase spec
+
+The checkpoint is only worth its cost if you intend to use it. Where you do not
+want a say at every boundary, hand the repeated invocation to a loop: set a goal
+spanning the whole spec ("keep running `/build` on 003 until every task is done
+and the reviewer is satisfied"), or drive it with a Ralph loop, such as the
+[`ralph-loop` plugin](https://github.com/anthropics/claude-plugins-official).
+The skill behaves the same either way - the loop only supplies the invocations.
 
 ### freehand
 
@@ -196,17 +187,16 @@ to disk but the code:
 3. Implement, following test-driven development for every behaviour change.
 4. Run the full build, test suite, and linter until green.
 5. Spawn a fresh `freehand-reviewer` subagent that attacks the work against the
-   transcript.
-6. Read its verdict line, incorporate the feedback and loop, up to the round cap
+   transcript, then incorporate the feedback and loop, up to the round cap
    (default 3).
-7. Report the rounds run, final verdict, what changed, every assumption it
+6. Report the rounds run, final verdict, what changed, every assumption it
    decided rather than asked about, and every test it skipped.
 
 It never asks about the technical approach - language, frameworks, libraries,
 file layout and test tooling all come from reading the project. Nor does it
 redirect you to `spec`, however large the request turns out to be; picking the
 route is yours. Like `build`, it commits as it goes and leaves a clean working
-tree; it creates no branches and pushes nothing.
+tree.
 
 #### What the reviewer judges against
 
@@ -215,13 +205,11 @@ prompt and every interview exchange, verbatim, re-sent to the reviewer in full
 each round. Verbatim is the point. A summary would be the builder's own account
 of the requirements, so the reviewer would be checking the implementation
 against the same understanding that produced it, and any drift or quiet
-descoping between the interview and the code would be invisible. The transcript
-is the one statement of intent the builder cannot revise.
+descoping would be invisible.
 
-The assumptions and the skipped tests are declared to the reviewer for the same
-reason: a judgement call nobody was told about cannot be reviewed. The reviewer
-weighs them against the transcript, and an undeclared decision that should have
-been declared is itself a finding.
+The assumptions and the skipped tests are declared for the same reason: a
+judgement call nobody was told about cannot be reviewed. An undeclared decision
+that should have been declared is itself a finding.
 
 ### The reviewer agents
 
@@ -240,9 +228,7 @@ than shared. Nothing keeps the copies in step, so a change to a passage in one
 is usually a change the others need too.
 
 Each system prompt is identical across coding agents; only the frontmatter
-differs, since each agent has its own shape and model syntax. `agents/`
-therefore holds a pair of definitions per platform - `claude/`, `opencode/` and
-`pi/` - and you install the pair that matches the agent you run.
+differs, since each agent has its own shape and model syntax.
 
 ### constitution
 
@@ -257,11 +243,9 @@ reviewed:
 3. Draft declarative, testable principles from the template, one concern each,
    with a short rationale where the reason is not obvious.
 4. Write the result into a single `## Constitution` section of `CLAUDE.md`, so
-   it loads into every Claude Code session automatically.
-
-Because the constitution lives in `CLAUDE.md`, `spec` (which runs a constitution
-check while planning), `build` and `freehand` all pick it up without any extra
-wiring.
+   it loads into every session automatically - and so `spec` (which runs a
+   constitution check while planning), `build` and `freehand` all pick it up
+   with no extra wiring.
 
 ## Usage
 
@@ -274,24 +258,22 @@ wiring.
 `spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`.
 `build` defaults to the latest spec when no selector is given, and within it to
 the next phase with unfinished tasks; name a different phase in words ("build
-phase 4") to override that. `freehand` takes
-its whole argument as the prompt and writes nothing to disk. Both default to a
-cap of three review rounds, changed by asking in words ("up to 5 rounds").
+phase 4") to override that. `freehand` takes its whole argument as the prompt.
+Both default to a cap of three review rounds, changed by asking in words ("up to
+5 rounds").
 
 ## Installation
 
 Each skill is a directory containing a `SKILL.md`; installing means placing it
-under a skills directory the coding agent scans. Each build loop then spawns its
-reviewer subagent - `build-reviewer` or `freehand-reviewer` - whose definitions
-differ per platform. Install the pair under `agents/` that matches the agent you
-run, or just the one whose skill you use.
+under a skills directory the coding agent scans. Install the pair of reviewers
+under `agents/` that matches the agent you run, or just the one whose skill you
+use.
 
 ### Claude Code
 
-Place the `spec`, `build`, `freehand` and `constitution` directories under a
-skills directory Claude Code reads - `.claude/skills/<name>/` in a project, or
-`~/.claude/skills/<name>/` globally. Claude Code loads discovered skills
-automatically, with no per-skill enable step.
+Place the `spec`, `build`, `freehand` and `constitution` directories under
+`.claude/skills/<name>/` in a project, or `~/.claude/skills/<name>/` globally.
+Discovered skills load automatically, with no per-skill enable step.
 
 For the reviewers, place `agents/claude/build-reviewer.md` and
 `agents/claude/freehand-reviewer.md` - already in Claude Code's agent shape, set
@@ -323,26 +305,23 @@ are `allow`, `deny`, or `ask`, and patterns support wildcards):
 }
 ```
 
-For the reviewers, `agents/opencode/build-reviewer.md` and
-`agents/opencode/freehand-reviewer.md` carry the OpenCode shape
+Place the reviewers from `agents/opencode/` - carrying the OpenCode shape
 (`mode: subagent`, a provider-prefixed `model`, a `reasoningEffort`, and a
-`permission` block) with the same system prompt bodies. Place them under
-`.opencode/agent/`
-(or `~/.config/opencode/agent/`). They ship set to `opencode-go/glm-5.2` at high
+`permission` block) - under `.opencode/agent/` or
+`~/.config/opencode/agent/`. They ship set to `opencode-go/glm-5.2` at high
 effort; change `model` to whatever you run.
 
 ### pi
 
-[pi](https://pi.dev) discovers skills under its own paths - `.pi/skills/` or
-`.agents/skills/` in a project (and ancestors up to the git root), or
-`~/.pi/agent/skills/` or `~/.agents/skills/` globally. It loads discovered
-skills automatically, with no per-skill allow step.
+[pi](https://pi.dev) discovers skills under `.pi/skills/` or `.agents/skills/`
+in a project (and ancestors up to the git root), or `~/.pi/agent/skills/` or
+`~/.agents/skills/` globally, and loads them automatically with no per-skill
+allow step.
 
-For the reviewers, pi discovers subagents from `.pi/agents/*.md` (project) or
-`~/.pi/agent/agents/*.md` (global), with project definitions winning on a name
-clash. Place `agents/pi/build-reviewer.md` and `agents/pi/freehand-reviewer.md`
-at one of those paths. Both are already in pi's agent shape, set to
-`opencode-go/glm-5.2` at high thinking; change `model` to whatever you run.
+Place the reviewers from `agents/pi/` under `.pi/agents/` (project) or
+`~/.pi/agent/agents/` (global), with project definitions winning on a name
+clash. Both ship set to `opencode-go/glm-5.2` at high thinking; change `model`
+to whatever you run.
 
 On every platform the `name` and `description` frontmatter are the only required
 fields; the Claude-specific `argument-hint` is ignored elsewhere. Wherever a
@@ -352,9 +331,8 @@ and the loop behaves the same.
 
 ## Other workflows worth a look
 
-This is simply my preferred way of working - it suits how I like to think a
-feature through before any code is written, but it is one option among many. A
-few others worth exploring:
+This is simply my preferred way of working, and one option among many. A few
+others worth exploring:
 
 - [GitHub spec-kit](https://github.com/github/spec-kit) - the spec → plan →
   tasks toolkit this flow borrows its overall shape from.
