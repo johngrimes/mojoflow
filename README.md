@@ -5,8 +5,8 @@ rough idea to a finished, reviewed implementation:
 
 - **`spec`** - interview yourself to a shared understanding, then write a
   complete, self-contained specification bundle.
-- **`build`** - implement that bundle a phase at a time, closing with an
-  adversarial review loop that runs until an independent reviewer is satisfied.
+- **`build`** - implement that bundle, then run an adversarial review loop until
+  an independent reviewer is satisfied.
 - **`freehand`** - skip the specification and build straight from a prompt, with
   the same review at the end.
 - **`constitution`** - draft or amend a project's non-negotiable principles in
@@ -29,7 +29,7 @@ The choice is about how much needs settling before code is worth writing.
 
 **`spec` → `build`** is the considered route. The interview walks the
 requirements, the screens and the technical approach, and leaves a bundle on
-disk that `build` implements a phase at a time. Reach for it when the feature is
+disk that `build` then implements task by task. Reach for it when the feature is
 large, when the requirements are genuinely unsettled, or when you want the
 decisions reviewable before any code exists.
 
@@ -126,53 +126,31 @@ The grilling idea comes from Matt Pocock's
 ### build
 
 Implements a feature from the `spec` bundle, then runs an adversarial review
-loop. Where `tasks.md` has more than one phase, an invocation builds **one
-phase** and stops; you run it again to take the next, and the review runs once
-the last one lands:
+loop:
 
 1. Load the spec bundle and determine the project's build, test, and lint
    commands.
-2. Resolve the phase to build - the next one in `tasks.md` with unfinished
-   tasks.
-3. Implement that phase and no other, following test-driven development, marking
-   each task done as it genuinely completes and committing as the work reaches a
-   green state.
-4. Run the full build, test suite, and linter until green.
-5. Stop there if phases remain, reporting what was built and what is still to
-   come. Only a finished `tasks.md` goes on to the review.
-6. Spawn a fresh `build-reviewer` subagent that attacks the whole feature -
-   every phase, not just the last - against the spec.
-7. Read its verdict line (`SATISFIED` ends the loop, `NEEDS_WORK` continues),
+2. Implement every phase in `tasks.md` order, following test-driven development,
+   marking each task done as it genuinely completes and committing as the work
+   reaches a green state.
+3. Run the full build, test suite, and linter until green.
+4. Spawn a fresh `build-reviewer` subagent that attacks the work against the
+   spec.
+5. Read its verdict line (`SATISFIED` ends the loop, `NEEDS_WORK` continues),
    incorporate the feedback and loop, up to the round cap (default 3).
-8. Report the rounds run, final verdict, and what changed.
+6. Report the rounds run, final verdict, and what changed.
 
-Each phase and each review round land as their own atomic commits, so every
-invocation ends with a clean working tree. The skill creates no branches and
-pushes nothing.
+Each phase and each review round land as their own atomic commits, so the loop
+ends with a clean working tree. The skill creates no branches and pushes
+nothing.
 
 Work is done only when the mandatory checks pass, every `tasks.md` item is
 genuinely complete, and the reviewer returns `VERDICT: SATISFIED`.
 
-#### Why a phase at a time, but one review
-
-The phase boundary is where you get a say. Each invocation ends at a green,
-committed increment you can inspect - and correct, or redirect - before the next
-phase is written on top of it, instead of one large drop at the end.
-
-The review waits for the whole feature because that is what the specification
-describes. Acceptance scenarios and success criteria are written about a
-finished feature, so a reviewer sent in at a phase boundary would judge work
-against a contract it is not yet meant to satisfy, manufacturing findings for
-things the next phase was always going to add.
-
-#### Driving a multi-phase spec
-
-The checkpoint is only worth its cost if you intend to use it. Where you do not
-want a say at every boundary, hand the repeated invocation to a loop: Claude
-Code's `/goal` command, given a goal spanning the whole spec ("/goal /build
-003"), or a Ralph loop plugin of your choice for whichever coding agent you
-run. The skill behaves the same either way - the loop only supplies the
-invocations.
+The review waits for a finished `tasks.md` because that is what the
+specification describes. Acceptance scenarios and success criteria are written
+about a finished feature, so a reviewer sent in earlier would judge work against
+a contract it is not yet meant to satisfy.
 
 ### freehand
 
@@ -256,11 +234,9 @@ reviewed:
 ```
 
 `spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`.
-`build` defaults to the latest spec when no selector is given, and within it to
-the next phase with unfinished tasks; name a different phase in words ("build
-phase 4") to override that. `freehand` takes its whole argument as the prompt.
-Both default to a cap of three review rounds, changed by asking in words ("up to
-5 rounds").
+`build` defaults to the latest spec when no selector is given. `freehand` takes
+its whole argument as the prompt. Both default to a cap of three review rounds,
+changed by asking in words ("up to 5 rounds").
 
 ## Installation
 
