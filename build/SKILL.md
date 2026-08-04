@@ -117,8 +117,8 @@ not one large drop at the end.
   a known-broken state. Under test-driven development a single commit carries
   the new tests, the implementation that satisfies them, and the matching `[X]`
   updates in `tasks.md`.
-- **Commit review fixes too**, once the checks are green again (e.g. `Address
-  review feedback: <summary>`).
+- **Commit review fixes too.** Each round commits the fixes it makes once the
+  checks are green again (e.g. `Address review feedback: <summary>`).
 - **Message style.** Imperative mood, concise subject (around 50 characters),
   body wrapped at 80 columns. No attribution footers.
 - **Finish clean.** `git status` must be clean before you report - commit any
