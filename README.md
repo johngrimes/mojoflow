@@ -168,11 +168,11 @@ things the next phase was always going to add.
 #### Driving a multi-phase spec
 
 The checkpoint is only worth its cost if you intend to use it. Where you do not
-want a say at every boundary, hand the repeated invocation to a loop: set a goal
-spanning the whole spec ("keep running `/build` on 003 until every task is done
-and the reviewer is satisfied"), or drive it with a Ralph loop, such as the
-[`ralph-loop` plugin](https://github.com/anthropics/claude-plugins-official).
-The skill behaves the same either way - the loop only supplies the invocations.
+want a say at every boundary, hand the repeated invocation to a loop: Claude
+Code's `/goal` command, given a goal spanning the whole spec ("keep running
+`/build` on 003 until every task is done and the reviewer is satisfied"), or a
+Ralph loop plugin of your choice for whichever coding agent you run. The skill
+behaves the same either way - the loop only supplies the invocations.
 
 ### freehand
 
