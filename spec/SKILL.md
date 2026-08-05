@@ -13,6 +13,13 @@ any point, and the second grilling surfaces anything wrong with the spec.
 This skill is self-contained. It owns its templates (`templates/`) and its
 wireframing assets (`wireframing/`), and calls no external CLI or other skill.
 
+## Where specs live
+
+`.local/specs/` holds only the specs that are not built yet or are being built
+right now; `build` moves each one into `.local/specs/archive/` once it is
+implemented. So a directory sitting directly under `.local/specs/` is
+outstanding work, and `archive/` is the record of what has already been done.
+
 ## Inputs
 
 `$ARGUMENTS` is the natural-language feature description. If empty, ask the user
@@ -37,8 +44,10 @@ Under `<repo-root>/.local/specs/` - the repository root being the working
 directory, or the nearest enclosing git repository if there is one - create the
 next sequential `NNN-short-name`:
 
-- `NNN` is the next free 3-digit number after scanning existing directories
-  (start at `001`).
+- `NNN` is one past the highest 3-digit number found across **both**
+  `.local/specs/` and `.local/specs/archive/` (start at `001` when neither
+  holds any). Numbers are never reused: an archived spec still consumes its
+  number.
 - `short-name` is a 2-4 word kebab-case name derived from the feature,
   action-noun where possible and preserving technical terms (e.g. `user-auth`,
   `oauth2-api-integration`, `fix-payment-timeout`).

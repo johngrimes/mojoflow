@@ -24,7 +24,11 @@ Parse `$ARGUMENTS`:
 
 - **Spec selector** (positional): a feature directory name or unique prefix
   (e.g. `003` or `003-user-auth`). Defaults to the highest-numbered directory
-  under `<repo-root>/.local/specs/`.
+  directly under `<repo-root>/.local/specs/`, which holds the outstanding specs
+  only. `archive/` is not a feature directory and is never resolved: if the
+  selector matches nothing outstanding but does match an archived spec, say it
+  has already been built and ask the user whether to move it back out of
+  `archive/` before building again.
 - **Max rounds**: default **3**, and changes only when the user asks in words
   (e.g. "up to 5 rounds").
 
@@ -74,13 +78,22 @@ any remote; that stays with the user.
 
 6. **Incorporate the feedback** in priority order, re-run the mandatory checks
    until green and commit the round's fixes, then return to step 4 - unless you
-   have hit the round cap, in which case stop.
+   have hit the round cap, in which case go to step 7.
 
-7. **Report**: rounds run, final verdict, what changed, and the commits made,
-   finishing with a clean working tree either way. The work is _done_ only when
-   all three hold: the mandatory checks pass, every `tasks.md` item is genuinely
-   complete, and the reviewer returned `VERDICT: SATISFIED`. If you stopped on
-   the cap instead, say so and list the reviewer's outstanding required changes.
+7. **Archive the spec** - only on `VERDICT: SATISFIED`. Move the whole feature
+   directory into `<repo-root>/.local/specs/archive/`, creating that directory
+   if it does not exist and keeping the `NNN-short-name` name unchanged, so
+   `.local/specs/` is left holding only work that is still outstanding. These
+   files are outside version control, so move them with `mv`, not `git mv`. If
+   you stopped on the cap or on an impasse, leave the directory where it is -
+   the feature is still in progress.
+
+8. **Report**: rounds run, final verdict, what changed, the commits made, and
+   where the spec directory now sits, finishing with a clean working tree either
+   way. The work is _done_ only when all three hold: the mandatory checks pass,
+   every `tasks.md` item is genuinely complete, and the reviewer returned
+   `VERDICT: SATISFIED`. If you stopped on the cap instead, say so and list the
+   reviewer's outstanding required changes.
 
 ## Committing
 

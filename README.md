@@ -13,7 +13,8 @@ rough idea to a finished, reviewed implementation:
   `CLAUDE.md`, where the building skills then honour them.
 
 They hand off cleanly. `spec` writes a feature directory under the project's
-`.local/specs/`, which `build` consumes. `freehand` writes nothing to disk and
+`.local/specs/`, which `build` consumes and then moves into
+`.local/specs/archive/`. `freehand` writes nothing to disk and
 hands off to nothing. `constitution` writes to `CLAUDE.md`, which the other
 three pick up automatically.
 
@@ -93,7 +94,8 @@ approval gates:
 1. **Grill** on requirements, scope, and UI - one question at a time, each with
    a recommended answer - until the requirements are unambiguous.
 2. Create the next sequential feature directory `NNN-short-name` under
-   `<repo-root>/.local/specs/`.
+   `<repo-root>/.local/specs/`, numbered one past the highest number in either
+   `.local/specs/` or `.local/specs/archive/`.
 3. Write `spec.md` (what and why, not how) plus a requirements checklist.
 4. Generate lo-fi HTML wireframes into `wireframes/`, if the feature has a UI.
 5. **Grill** on the technical approach - stack, frameworks, storage, testing,
@@ -138,14 +140,19 @@ loop:
    spec.
 5. Read its verdict line (`SATISFIED` ends the loop, `NEEDS_WORK` continues),
    incorporate the feedback and loop, up to the round cap (default 3).
-6. Report the rounds run, final verdict, and what changed.
+6. On `SATISFIED`, move the feature directory into `.local/specs/archive/`.
+7. Report the rounds run, final verdict, and what changed.
 
 Each phase and each review round land as their own atomic commits, so the loop
 ends with a clean working tree. The skill creates no branches and pushes
 nothing.
 
 Work is done only when the mandatory checks pass, every `tasks.md` item is
-genuinely complete, and the reviewer returns `VERDICT: SATISFIED`.
+genuinely complete, and the reviewer returns `VERDICT: SATISFIED`. That is also
+what triggers the archive move, so `.local/specs/` reads as a list of
+outstanding work: what is in it is unbuilt or being built, and everything
+finished sits in `archive/`. Numbering runs across both, so an archived spec
+keeps its number for good.
 
 The review waits for a finished `tasks.md` because that is what the
 specification describes. Acceptance scenarios and success criteria are written
@@ -233,10 +240,11 @@ reviewed:
 /freehand <what you want built>
 ```
 
-`spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`.
-`build` defaults to the latest spec when no selector is given. `freehand` takes
-its whole argument as the prompt. Both default to a cap of three review rounds,
-changed by asking in words ("up to 5 rounds").
+`spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`,
+and `build` moves that directory to `.local/specs/archive/` once the reviewer is
+satisfied. `build` defaults to the latest outstanding spec when no selector is
+given. `freehand` takes its whole argument as the prompt. Both default to a cap
+of three review rounds, changed by asking in words ("up to 5 rounds").
 
 ## Installation
 
