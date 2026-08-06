@@ -28,8 +28,9 @@ words (e.g. "up to 5 rounds"). Never read a number in the prompt as the cap - it
 almost always belongs to the request itself.
 
 This skill commits as it goes (see **Committing**), so the working tree is clean
-by the time the loop ends. It does not create branches or push to any remote;
-that stays with the user.
+by the time the loop ends. Nothing reaches the remote - issues, the push, the
+pull request - except through the delivery steps (9-11), each gated on the
+user's approval.
 
 ## Procedure
 
@@ -106,15 +107,36 @@ that stays with the user.
 
 8. **Incorporate the feedback** in priority order, commit the round's fixes once
    the checks are green again, then return to step 5 - unless you have hit the
-   round cap, in which case stop.
+   round cap, in which case go to step 12.
 
-9. **Report**: the rounds run and the final verdict, what changed and the
-   commits made, every assumption you decided rather than asked, and every test
-   you skipped and why. Finish with a clean working tree either way. The work is
-   _done_ only when all three hold: the mandatory checks pass, the
-   implementation does everything the transcript asked for, and the reviewer
-   returned `VERDICT: SATISFIED`. If you stopped on the cap instead, say so and
-   list the reviewer's outstanding required changes.
+9. **Collect unresolved issues.** This step and the two after it run only on
+   `VERDICT: SATISFIED`; a capped or impasse finish goes straight to the
+   report. Gather whatever the build left open - reviewer suggestions not acted
+   on, items deferred as out of scope, TODOs the work introduced, limitations
+   noticed along the way. If there are any, list them and ask the user which to
+   create as issues on the project's GitHub repository, then create the chosen
+   ones with `gh`. If nothing is open, say so and move on.
+
+10. **Ask to deliver.** Ask the user for approval to push the branch and open a
+    draft pull request. If the branch name carries a `worktree-` prefix,
+    include a proposed replacement (a short name for what was built) in the ask
+    and rename it with `git branch -m` before pushing. Without approval, the
+    work stays local and you go straight to the report.
+
+11. **See CI through.** Once pushed, watch the pull request's checks
+    (`gh pr checks --watch` or the repository's equivalent) until they finish.
+    On failure, diagnose, fix, commit and push again - step 10's approval
+    covers follow-up pushes to the same branch - and watch the new run. Stop
+    only on green checks or an impasse to bring back to the user.
+
+12. **Report**: the rounds run and the final verdict, what changed and the
+    commits made, every assumption you decided rather than asked, every test
+    you skipped and why, any issues created, and the pull request and CI
+    outcome where delivery was approved. Finish with a clean working tree
+    either way. The work is _done_ only when all three hold: the mandatory
+    checks pass, the implementation does everything the transcript asked for,
+    and the reviewer returned `VERDICT: SATISFIED`. If you stopped on the cap
+    instead, say so and list the reviewer's outstanding required changes.
 
 ## Committing
 
@@ -139,5 +161,7 @@ not one large drop at the end.
   "Round 2 of 3 - sending to reviewer") and report each verdict in one line.
 - The cap is a hard limit. The loop ends as satisfied only when the reviewer
   itself returns `VERDICT: SATISFIED` - never declare success on its behalf.
+- Delivery is opt-in: create only the issues the user selects, and never
+  rename the branch, push or open the pull request without step 10's approval.
 - If two consecutive rounds make no real progress on the same findings, stop
   early, report the impasse, and ask the user how to proceed.
