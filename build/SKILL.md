@@ -40,8 +40,9 @@ Resolve the feature directory under `<repo-root>/.local/specs/`. If it has no
 in one line: the resolved directory, how many phases it holds and the round cap.
 
 This skill commits as it goes (see **Committing**), so the loop ends with a
-clean working tree, satisfied or capped. It does not create branches or push to
-any remote; that stays with the user.
+clean working tree, satisfied or capped. Nothing reaches the remote - issues,
+the push, the pull request - except through the delivery steps (8-10), each
+gated on the user's approval.
 
 ## Procedure
 
@@ -88,12 +89,33 @@ any remote; that stays with the user.
    you stopped on the cap or on an impasse, leave the directory where it is -
    the feature is still in progress.
 
-8. **Report**: rounds run, final verdict, what changed, the commits made, and
-   where the spec directory now sits, finishing with a clean working tree either
-   way. The work is _done_ only when all three hold: the mandatory checks pass,
-   every `tasks.md` item is genuinely complete, and the reviewer returned
-   `VERDICT: SATISFIED`. If you stopped on the cap instead, say so and list the
-   reviewer's outstanding required changes.
+8. **Collect unresolved issues.** This step and the two after it run only on
+   `VERDICT: SATISFIED`; a capped or impasse finish goes straight to the
+   report. Gather whatever the build left open - reviewer suggestions not acted
+   on, items deferred as out of scope, TODOs the work introduced, limitations
+   noticed along the way. If there are any, list them and ask the user which to
+   create as issues on the project's GitHub repository, then create the chosen
+   ones with `gh`. If nothing is open, say so and move on.
+
+9. **Ask to deliver.** Ask the user for approval to push the branch and open a
+   draft pull request. If the branch name carries a `worktree-` prefix, include
+   a proposed replacement (e.g. the spec directory's `NNN-short-name`) in the
+   ask and rename it with `git branch -m` before pushing. Without approval, the
+   work stays local and you go straight to the report.
+
+10. **See CI through.** Once pushed, watch the pull request's checks
+    (`gh pr checks --watch` or the repository's equivalent) until they finish.
+    On failure, diagnose, fix, commit and push again - step 9's approval covers
+    follow-up pushes to the same branch - and watch the new run. Stop only on
+    green checks or an impasse to bring back to the user.
+
+11. **Report**: rounds run, final verdict, what changed, the commits made,
+    where the spec directory now sits, any issues created, and the pull request
+    and CI outcome where delivery was approved - finishing with a clean working
+    tree either way. The work is _done_ only when all three hold: the mandatory
+    checks pass, every `tasks.md` item is genuinely complete, and the reviewer
+    returned `VERDICT: SATISFIED`. If you stopped on the cap instead, say so
+    and list the reviewer's outstanding required changes.
 
 ## Committing
 
@@ -123,5 +145,7 @@ not one large drop at the end.
   loop.
 - The cap is a hard limit. The loop ends as satisfied only when the reviewer
   itself returns `VERDICT: SATISFIED` - never declare success on its behalf.
+- Delivery is opt-in: create only the issues the user selects, and never
+  rename the branch, push or open the pull request without step 9's approval.
 - If two consecutive rounds make no real progress on the same findings, stop
   early, report the impasse, and ask the user how to proceed.
