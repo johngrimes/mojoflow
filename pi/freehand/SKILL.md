@@ -117,13 +117,13 @@ user's approval.
    cat <<'EOF' >> "$brief"
    <this round's inputs: transcript, declared assumptions, declared test skips, work summary, prior feedback>
    EOF
-   cat "$brief" | pi -p --no-session --model opencode-go/glm-5.2 --thinking high \
+   cat "$brief" | pi -p --no-session --model opencode-go/kimi-k3 --thinking high \
      --tools read,bash,grep,find,ls 2>&1 | tee "$out"
    ```
 
    The flags give the reviewer its own configuration:
 
-   - `--model opencode-go/glm-5.2 --thinking high` sets its model and effort.
+   - `--model opencode-go/kimi-k3 --thinking high` sets its model and effort.
      Change them to whatever you run, or drop `--model` to review with your
      configured default.
    - `--tools read,bash,grep,find,ls` keeps it read-only - it can inspect and

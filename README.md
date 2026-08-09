@@ -76,7 +76,7 @@ constitution/               The /constitution skill
   references/               constitution template
 agents/                     The reviewer agents, one pair per coding agent
   claude/                     Claude Code (fable, medium effort)
-  opencode/                   opencode (glm-5.2, high effort)
+  opencode/                   opencode (kimi-k3, high effort)
 pi/                         The /build and /freehand skills for pi, which
   build/                      spawn a fresh headless pi process as the
     SKILL.md                  reviewer instead of dispatching a subagent
@@ -234,7 +234,7 @@ pi skill owns its reviewer prompt (`build-reviewer.md` /
 The spawned reviewer starts with no session memory, inherits the project's
 context files and skills (including `agent-browser` for web verification), runs
 read-only (`--tools read,bash,grep,find,ls`), and ships set to
-`opencode-go/glm-5.2` at high thinking; change the `--model` and `--thinking`
+`opencode-go/kimi-k3` at high thinking; change the `--model` and `--thinking`
 flags in the skill to whatever you run.
 
 ### constitution
@@ -316,7 +316,7 @@ are `allow`, `deny`, or `ask`, and patterns support wildcards):
 Place the reviewers from `agents/opencode/` - carrying the OpenCode shape
 (`mode: subagent`, a provider-prefixed `model`, a `reasoningEffort`, and a
 `permission` block) - under `.opencode/agent/` or
-`~/.config/opencode/agent/`. They ship set to `opencode-go/glm-5.2` at high
+`~/.config/opencode/agent/`. They ship set to `opencode-go/kimi-k3` at high
 effort; change `model` to whatever you run.
 
 ### pi
