@@ -1,6 +1,6 @@
 # MojoFlow
 
-Four Claude Code skills for an agentic coding workflow, taking a feature from a
+Four skills for an agentic coding workflow, taking a feature from a
 rough idea to a finished, reviewed implementation:
 
 - **`spec`** - interview yourself to a shared understanding, then write a
@@ -77,11 +77,18 @@ constitution/               The /constitution skill
 agents/                     The reviewer agents, one pair per coding agent
   claude/                     Claude Code (fable, medium effort)
   opencode/                   opencode (glm-5.2, high effort)
-  pi/                         pi (glm-5.2, high effort)
+pi/                         The /build and /freehand skills for pi, which
+  build/                      spawn a fresh headless pi process as the
+    SKILL.md                  reviewer instead of dispatching a subagent
+    build-reviewer.md          (pi has none); each owns its reviewer prompt
+  freehand/
+    SKILL.md
+    freehand-reviewer.md
 ```
 
 Each `agents/` subdirectory holds a `build-reviewer.md` and a
-`freehand-reviewer.md`.
+`freehand-reviewer.md`. The `pi/` directory holds pi-only variants of `build`
+and `freehand`; see [The reviewer for pi](#the-reviewer-for-pi).
 
 ## The skills
 
@@ -215,6 +222,21 @@ is usually a change the others need too.
 Each system prompt is identical across coding agents; only the frontmatter
 differs, since each agent has its own shape and model syntax.
 
+### The reviewer for pi
+
+pi has no subagents and ships no Task tool, so the pi variants of `build` and
+`freehand` in `pi/` do not dispatch a reviewer by name. Instead they spawn a
+fresh pi process headlessly (`pi -p --no-session`), pipe the reviewer prompt
+and the round's inputs to it on stdin, and read the verdict from stdout. Each
+pi skill owns its reviewer prompt (`build-reviewer.md` /
+`freehand-reviewer.md`), so there are no agent files to install.
+
+The spawned reviewer starts with no session memory, inherits the project's
+context files and skills (including `agent-browser` for web verification), runs
+read-only (`--tools read,bash,grep,find,ls`), and ships set to
+`opencode-go/glm-5.2` at high thinking; change the `--model` and `--thinking`
+flags in the skill to whatever you run.
+
 ### constitution
 
 Drafts or amends a project's constitution - a short set of non-negotiable
@@ -249,9 +271,11 @@ of three review rounds, changed by asking in words ("up to 5 rounds").
 ## Installation
 
 Each skill is a directory containing a `SKILL.md`; installing means placing it
-under a skills directory the coding agent scans. Install the pair of reviewers
-under `agents/` that matches the agent you run, or just the one whose skill you
-use.
+under a skills directory the coding agent scans. For Claude Code and opencode,
+also install the pair of reviewers under `agents/` that matches the agent you
+run, or just the one whose skill you use. pi needs no agents - its reviewer
+prompts live inside the pi skill variants (see [The reviewer for
+pi](#the-reviewer-for-pi)).
 
 ### Claude Code
 
@@ -302,16 +326,18 @@ in a project (and ancestors up to the git root), or `~/.pi/agent/skills/` or
 `~/.agents/skills/` globally, and loads them automatically with no per-skill
 allow step.
 
-Place the reviewers from `agents/pi/` under `.pi/agents/` (project) or
-`~/.pi/agent/agents/` (global), with project definitions winning on a name
-clash. Both ship set to `opencode-go/glm-5.2` at high thinking; change `model`
-to whatever you run.
+`spec` and `constitution` work as-is. For `build` and `freehand`, use the pi
+variants in `pi/` instead of the top-level pair, copying `pi/build` as `build`
+and `pi/freehand` as `freehand` (only one version of each skill name can be
+installed). Each pi variant is self-contained - the reviewer prompt lives
+inside the skill directory - so there are no agent files to install.
 
 On every platform the `name` and `description` frontmatter are the only required
 fields; the Claude-specific `argument-hint` is ignored elsewhere. Wherever a
 skill says "spawn the `build-reviewer` subagent" or "spawn the
-`freehand-reviewer` subagent", each platform dispatches to that agent by name
-and the loop behaves the same.
+`freehand-reviewer` subagent", Claude Code and opencode dispatch to that agent
+by name. pi has no subagents, so its skill variants instead spawn a fresh pi
+process to play the reviewer - see [The reviewer for pi](#the-reviewer-for-pi).
 
 ## Other workflows worth a look
 
