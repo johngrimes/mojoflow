@@ -2,7 +2,6 @@
 description: Independent adversarial reviewer for the /build loop. Read-only. Judges an implementation against its full specification bundle and returns a verdict plus actionable feedback.
 mode: subagent
 model: opencode-go/kimi-k3
-reasoningEffort: high
 permission:
   edit: deny
 ---
