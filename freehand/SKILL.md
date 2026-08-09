@@ -85,7 +85,7 @@ user's approval.
    fixing failures until all are green and committing any fixes the full suite
    surfaced. Never proceed to review on red checks.
 
-6. **Spawn the reviewer.** Use the Agent tool with
+6. **Spawn the reviewer.** Use the Task tool with
    `subagent_type: freehand-reviewer`; its model and effort come from its own
    frontmatter, so do not override them here. Give it:
    - The **transcript** from step 3, in full and verbatim, every round. It has

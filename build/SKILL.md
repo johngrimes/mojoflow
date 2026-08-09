@@ -65,7 +65,7 @@ gated on the user's approval.
    fixing failures until all are green and committing any fixes the full suite
    surfaced. The review never starts on red checks.
 
-4. **Spawn the reviewer.** Use the Agent tool with
+4. **Spawn the reviewer.** Use the Task tool with
    `subagent_type: build-reviewer`; its model and effort come from its own
    frontmatter, so do not override them here. Give it the feature directory
    path, a summary of the work across every phase, the full diff for the
