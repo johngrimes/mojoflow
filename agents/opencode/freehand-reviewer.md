@@ -1,7 +1,7 @@
 ---
 description: Independent adversarial reviewer for the /freehand loop. Read-only. Judges an implementation against the verbatim record of what the user asked for and returns a verdict plus actionable feedback.
 mode: subagent
-model: opencode-go/glm-5.2
+model: opencode-go/kimi-k3
 reasoningEffort: high
 permission:
   edit: deny
