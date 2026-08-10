@@ -18,6 +18,16 @@ partly built one cannot demonstrate them.
 
 This skill is self-contained and does not depend on any other skill.
 
+## Where specs live
+
+Specs always live in the **main repository**, never in a linked worktree.
+Resolve `<repo-root>` by running
+`git rev-parse --path-format=absolute --git-common-dir` from the working
+directory; `<repo-root>` is the parent directory of the resulting `.git`
+directory. In a normal checkout this is the repository root; in a linked
+worktree it resolves to the main repository's root. If there is no enclosing
+git repository, use the working directory.
+
 ## Inputs
 
 Parse `$ARGUMENTS`:

@@ -15,6 +15,15 @@ wireframing assets (`wireframing/`), and calls no external CLI or other skill.
 
 ## Where specs live
 
+Specs always live in the **main repository**, never in a linked worktree. Resolve
+`<repo-root>` as follows: run `git rev-parse --path-format=absolute --git-common-dir`
+from the working directory; `<repo-root>` is the parent directory of the
+resulting `.git` directory. In a normal checkout this is just the repository
+root, but in a linked worktree it resolves to the main repository's root, so a
+spec written from a worktree lands in the main repo's `.local/specs/` where it
+remains visible after the worktree is removed. If there is no enclosing git
+repository, use the working directory.
+
 `.local/specs/` holds only the specs that are not built yet or are being built
 right now; `build` moves each one into `.local/specs/archive/` once it is
 implemented. So a directory sitting directly under `.local/specs/` is
@@ -40,9 +49,9 @@ files during this step.
 
 ### 2. Create the feature directory
 
-Under `<repo-root>/.local/specs/` - the repository root being the working
-directory, or the nearest enclosing git repository if there is one - create the
-next sequential `NNN-short-name`:
+Under `<repo-root>/.local/specs/` - with `<repo-root>` resolved per "Where specs
+live" above (the main repository root, even when working in a linked worktree) -
+create the next sequential `NNN-short-name`:
 
 - `NNN` is one past the highest 3-digit number found across **both**
   `.local/specs/` and `.local/specs/archive/` (start at `001` when neither
