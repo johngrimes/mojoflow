@@ -1,10 +1,10 @@
 # MojoFlow
 
-Five skills for an agentic coding workflow, taking a feature from a rough idea
-to a finished, reviewed implementation:
+Five agent-agnostic skills for an agentic coding workflow, taking a feature
+from a rough idea to a finished, reviewed implementation:
 
-- **`spec`** - interview yourself to a shared understanding, then write a
-  complete, self-contained specification bundle.
+- **`spec`** - interview to a shared understanding, then write a complete,
+  self-contained specification bundle.
 - **`build`** - implement that bundle, then run an adversarial review loop until
   an independent reviewer is satisfied.
 - **`freehand`** - skip the specification and build straight from a prompt, with
@@ -14,16 +14,10 @@ to a finished, reviewed implementation:
 - **`constitution`** - draft or amend a project's non-negotiable principles in
   `CLAUDE.md`, where the building skills then honour them.
 
-They hand off cleanly. `spec` writes a feature directory under the project's
-`.local/specs/`, which `build` consumes and then moves into
-`.local/specs/archive/`. `freehand` writes nothing to disk and hands off to
-nothing. `quest` is a loop rather than a handoff: it keeps delegating the same
-objective until it is achieved. `constitution` writes to `CLAUDE.md`, which
-the other four pick up automatically.
-
-The overall shape - the spec → plan → tasks progression, the artifact set, the
-sequential `NNN-short-name` feature directories, and the project constitution -
-draws on GitHub's [spec-kit](https://github.com/github/spec-kit).
+Each skill is a single self-contained `SKILL.md` with no agent-specific wiring:
+no agent files, no per-agent variants. The reviewer prompts live inside the
+skills, and the model and effort for each spawned subagent are listed in the
+skill itself.
 
 ## The workflow
 
@@ -33,13 +27,13 @@ The choice is about how much needs settling before code is worth writing.
 
 **`spec` → `build`** is the considered route. The interview walks the
 requirements, the screens and the technical approach, and leaves a bundle on
-disk that `build` then implements task by task. Reach for it when the feature is
-large, when the requirements are genuinely unsettled, or when you want the
+disk that `build` then implements phase by phase. Reach for it when the feature
+is large, when the requirements are genuinely unsettled, or when you want the
 decisions reviewable before any code exists.
 
-**`freehand`** is the direct route. It reads the codebase, asks only what it
-cannot work out for itself, decides the rest and tells you what it decided, then
-builds. Reach for it when the shape of the thing is already clear in your head.
+**`freehand`** is the direct route. It grills on requirements, decides the rest
+for itself, then builds. Reach for it when the shape of the thing is already
+clear in your head.
 
 Both routes end in an adversarial review loop that runs until an independent
 reviewer is satisfied. `freehand` gives up the specification, not the standard.
@@ -52,8 +46,8 @@ cheaper mistake.
 **`quest`** is the persistence route. It is for when the objective is clear but
 the path is not - a gnarly bug, a flaky integration, a long campaign of small
 fixes. You delegate the objective verbatim to a fresh subagent, verify the
-result yourself, and respawn until it is genuinely achieved or the attempt cap
-is hit. No specification, no interview, no handoff - just the loop.
+result yourself, and respawn until it is genuinely achieved. No specification,
+no interview, no handoff - just the loop.
 
 ### Where to start
 
@@ -85,30 +79,10 @@ quest/                      The /quest skill
 constitution/               The /constitution skill
   SKILL.md
   references/               constitution template
-agents/                     The reviewer and worker agents, one pair per
-  claude/                     coding agent
-    build-reviewer.md         Claude Code (fable, medium effort)
-    freehand-reviewer.md
-    quest-worker.md
-  opencode/                   opencode (kimi-k3, high effort)
-    build-reviewer.md
-    freehand-reviewer.md
-    quest-worker.md
-pi/                         The /build, /freehand and /quest skills for pi,
-  build/                      which spawn a fresh headless pi process as the
-    SKILL.md                  reviewer or worker instead of dispatching a
-    build-reviewer.md          subagent (pi has none); each owns its prompt
-  freehand/
-    SKILL.md
-    freehand-reviewer.md
-  quest/
-    SKILL.md
 ```
 
-Each `agents/` subdirectory holds a `build-reviewer.md`, a
-`freehand-reviewer.md` and a `quest-worker.md`. The `pi/` directory holds
-pi-only variants of `build`, `freehand` and `quest`; see [The pi
-variants](#the-pi-variants).
+Each skill is self-contained: the reviewer prompts for `build` and `freehand`
+live inside their `SKILL.md`, so there are no agent files to install anywhere.
 
 ## The skills
 
@@ -157,29 +131,15 @@ The grilling idea comes from Matt Pocock's
 Implements a feature from the `spec` bundle, then runs an adversarial review
 loop:
 
-1. Load the spec bundle and determine the project's build, test, and lint
-   commands.
-2. Implement every phase in `tasks.md` order, following test-driven development,
-   marking each task done as it genuinely completes and committing as the work
-   reaches a green state.
-3. Run the full build, test suite, and linter until green.
-4. Spawn a fresh `build-reviewer` subagent that attacks the work against the
-   spec.
-5. Read its verdict line (`SATISFIED` ends the loop, `NEEDS_WORK` continues),
-   incorporate the feedback and loop, up to the round cap (default 3).
-6. On `SATISFIED`, move the feature directory into `.local/specs/archive/`.
-7. Report the rounds run, final verdict, and what changed.
-
-Each phase and each review round land as their own atomic commits, so the loop
-ends with a clean working tree. The skill creates no branches and pushes
-nothing.
-
-Work is done only when the mandatory checks pass, every `tasks.md` item is
-genuinely complete, and the reviewer returns `VERDICT: SATISFIED`. That is also
-what triggers the archive move, so `.local/specs/` reads as a list of
-outstanding work: what is in it is unbuilt or being built, and everything
-finished sits in `archive/`. Numbering runs across both, so an archived spec
-keeps its number for good.
+1. Delegate implementation to the `quest` skill, which invokes implementation
+   agents one phase at a time - each gets the full spec but is asked for a
+   single phase, so the effort stays bounded.
+2. When every phase is done and every task in `tasks.md` is marked complete, run
+   up to `[max-rounds]` rounds of adversarial review: spawn a fresh reviewer
+   subagent that attacks the work against the spec, incorporate its feedback,
+   and loop.
+3. Move the feature directory into `.local/specs/archive/` once built, so
+   `.local/specs/` reads as a list of outstanding work.
 
 The review waits for a finished `tasks.md` because that is what the
 specification describes. Acceptance scenarios and success criteria are written
@@ -191,101 +151,35 @@ a contract it is not yet meant to satisfy.
 Builds straight from a prompt, with no specification bundle and nothing written
 to disk but the code:
 
-1. Read the codebase first, so nothing discoverable on disk becomes a question.
-2. Grill on requirements only, one question at a time. The default for an open
-   question is to decide it rather than ask - questions are for what would
-   materially change what gets built, and zero questions is a fine outcome for a
-   clear prompt.
-3. Implement, following test-driven development for every behaviour change.
-4. Run the full build, test suite, and linter until green.
-5. Spawn a fresh `freehand-reviewer` subagent that attacks the work against the
-   transcript, then incorporate the feedback and loop, up to the round cap
-   (default 3).
-6. Report the rounds run, final verdict, what changed, every assumption it
-   decided rather than asked about, and every test it skipped.
+1. Refine the prompt with the `grill-me` skill, resolving ambiguities from a
+   requirements perspective only.
+2. Implement, following test-driven development for every behaviour change.
+3. Run the full build, test suite, and linter until green.
+4. Spawn a fresh reviewer subagent that attacks the work against the prompt and
+   the grilling session, incorporate its feedback, and loop, up to the round
+   cap.
 
 It never asks about the technical approach - language, frameworks, libraries,
 file layout and test tooling all come from reading the project. Nor does it
 redirect you to `spec`, however large the request turns out to be; picking the
-route is yours. Like `build`, it commits as it goes and leaves a clean working
-tree.
-
-#### What the reviewer judges against
-
-With no specification on disk, the contract is the **transcript**: your original
-prompt and every interview exchange, verbatim, re-sent to the reviewer in full
-each round. Verbatim is the point. A summary would be the builder's own account
-of the requirements, so the reviewer would be checking the implementation
-against the same understanding that produced it, and any drift or quiet
-descoping would be invisible.
-
-The assumptions and the skipped tests are declared for the same reason: a
-judgement call nobody was told about cannot be reviewed. An undeclared decision
-that should have been declared is itself a finding.
+route is yours.
 
 ### quest
 
 Pursues an objective in a loop until it is genuinely achieved, with no
 specification and no interview:
 
-1. Delegate the objective verbatim to a fresh `quest-worker` subagent.
+1. Delegate the objective verbatim to a fresh subagent.
 2. Judge the result yourself - run its tests, inspect what it changed, exercise
    the outcome - never trust its claim.
-3. On success, stop and report. Otherwise respawn with the same objective plus
-   a short note on what the prior attempt did and why it failed, until the
-   attempt cap is reached (a trailing integer on the objective) or an attempt
-   makes no progress.
+3. On success, stop and report. Otherwise respawn with the same objective;
+   attempts are uncapped.
 
-The objective is everything after `/quest`; attempts are uncapped without a
-cap, stopping only when the objective is achieved or the stall guard fires.
 Each attempt is a fresh subagent with its own context, working in the same
 directory, so later attempts build on earlier ones. The loop is for objectives
-that are clear but hard - a bug that resists diagnosis, a flaky integration,
-a long campaign of small fixes - or for "keep trying until it works". It
-writes nothing to disk but the work.
-
-### The reviewer agents
-
-Both routes end at an independent, read-only, deliberately adversarial reviewer.
-It reads its contract directly rather than the orchestrator's summary of it,
-proves the implementation works end to end by running it, attacks the weakest
-points, and returns a machine-readable verdict plus an ordered list of required
-changes. The skill spawns it fresh each round.
-
-There are two, because they judge against different contracts: `build-reviewer`
-reads a specification bundle from disk, while `freehand-reviewer` is handed a
-transcript and has to weigh declared assumptions and test skips along with it.
-Everything else - the adversarial stance, the mandatory prove-it-works step, the
-focus areas, the verdict format - is the same by design, and duplicated rather
-than shared. Nothing keeps the copies in step, so a change to a passage in one
-is usually a change the others need too.
-
-`quest` inverts the shape: the orchestrator judges each attempt itself, so
-nothing adversarial is needed. What `quest` spawns is a `quest-worker` - a
-full-capability agent that executes the delegated objective in the shared
-working directory and reports back what it did and the state it left.
-
-Each system prompt is identical across coding agents; only the frontmatter
-differs, since each agent has its own shape and model syntax.
-
-### The pi variants
-
-pi has no subagents and ships no Task tool, so the pi variants of `build`,
-`freehand` and `quest` in `pi/` do not dispatch a subagent by name. Instead
-they spawn a fresh pi process headlessly (`pi -p --no-session`). `build` and
-`freehand` pipe a reviewer prompt and the round's inputs to it on stdin and
-read the verdict from stdout; `quest` passes it the objective and judges the
-result itself. `build` and `freehand` own their reviewer prompts
-(`build-reviewer.md` / `freehand-reviewer.md`), so there are no agent files to
-install; `quest` needs none either.
-
-The spawned reviewer starts with no session memory, inherits the project's
-context files and skills (including `agent-browser` for web verification), runs
-read-only (`--tools read,bash,grep,find,ls`), and ships set to
-`opencode-go/kimi-k3` at high thinking; change the `--model` and `--thinking`
-flags in the skill to whatever you run. The `quest` variant instead spawns
-with default tools and `--no-skills`, so its worker can write and commit but
-cannot re-enter any skill.
+that are clear but hard - a bug that resists diagnosis, a flaky integration, a
+long campaign of small fixes - or for "keep trying until it works". It writes
+nothing to disk but the work.
 
 ### constitution
 
@@ -304,97 +198,53 @@ reviewed:
    constitution check while planning), `build` and `freehand` all pick it up
    with no extra wiring.
 
+### The reviewers
+
+`build` and `freehand` each end at an independent, deliberately adversarial
+reviewer. It reads its contract directly rather than the orchestrator's summary
+of it, proves the implementation works end to end by running it, attacks the
+weakest points, and returns a machine-readable verdict plus an ordered list of
+required changes. The skill spawns it fresh each round.
+
+The two reviewer prompts live inside `build/SKILL.md` and `freehand/SKILL.md`
+and differ only in their inputs: `build`'s reviewer reads a specification
+bundle from disk, `freehand`'s is handed the prompt and the grilling session.
+Everything else - the adversarial stance, the mandatory prove-it-works step, the
+focus areas, the verdict format - is the same by design, and duplicated rather
+than shared.
+
+`quest` inverts the shape: the orchestrator judges each attempt itself, so
+nothing adversarial is needed. What `quest` spawns is an implementation agent
+that executes the delegated objective in the shared working directory and
+reports back what it did and the state it left.
+
 ## Usage
 
 ```
 /spec <feature description>
 /build [spec-selector] [max-rounds]
 /freehand <what you want built>
-/quest <objective> [max-attempts]
+/quest <objective>
 ```
 
 `spec` writes its artifacts under `<repo-root>/.local/specs/NNN-short-name/`,
-and `build` moves that directory to `.local/specs/archive/` once the reviewer is
-satisfied. `build` defaults to the latest outstanding spec when no selector is
-given. `freehand` takes its whole argument as the prompt; both default to a cap
-of three review rounds, changed by asking in words ("up to 5 rounds"). `quest`
-takes its whole argument as the objective; a trailing integer caps the number
-of attempts, and without one attempts are uncapped.
+and `build` moves that directory to `.local/specs/archive/` once built. `build`
+defaults to the latest outstanding spec when no selector is given, and to three
+review rounds unless changed in words ("up to 5 rounds"). `freehand` and `quest`
+take their whole argument as the prompt or objective; `quest` attempts are
+uncapped.
 
 ## Installation
 
-Each skill is a directory containing a `SKILL.md`; installing means placing it
-under a skills directory the coding agent scans. For Claude Code and opencode,
-also install the reviewers and worker under `agents/` that match the agent you
-run, or just the ones whose skills you use. pi needs no agents - its reviewer
-prompts live inside the pi skill variants (see [The pi
-variants](#the-pi-variants)).
+Each skill is a directory containing a `SKILL.md`; installing means copying the
+directories under a skills directory the coding agent scans - `.claude/skills/`
+for Claude Code, `.opencode/skills/` for opencode, or `.pi/skills/` for pi, in
+the project or the user's home directory. There are no agent files and no
+per-agent variants to install.
 
-### Claude Code
-
-Place the `spec`, `build`, `freehand`, `quest` and `constitution` directories
-under `.claude/skills/<name>/` in a project, or `~/.claude/skills/<name>/`
-globally. Discovered skills load automatically, with no per-skill enable step.
-
-For the reviewers and worker, place `agents/claude/build-reviewer.md`,
-`agents/claude/freehand-reviewer.md` and `agents/claude/quest-worker.md` -
-already in Claude Code's agent shape, set to `fable` at medium effort - under
-`.claude/agents/` (project) or `~/.claude/agents/` (global), keeping their file
-names.
-
-### OpenCode
-
-[OpenCode](https://opencode.ai) discovers skills by walking up from the working
-directory to the git root, scanning (among others) the same
-`.claude/skills/<name>/SKILL.md` locations Claude Code uses - so skills already
-installed for Claude Code are found with no further work. Otherwise place them
-under `.opencode/skills/<name>/` (project) or
-`~/.config/opencode/skills/<name>/` (global).
-
-Skills are gated by pattern in `opencode.json`. Allow them explicitly (values
-are `allow`, `deny`, or `ask`, and patterns support wildcards):
-
-```json
-{
-  "permission": {
-    "skill": {
-      "spec": "allow",
-      "build": "allow",
-      "freehand": "allow",
-      "quest": "allow",
-      "constitution": "allow"
-    }
-  }
-}
-```
-
-Place the reviewers and worker from `agents/opencode/` - carrying the OpenCode
-shape (`mode: subagent`, a provider-prefixed `model`, and a `permission`
-block) - under `.opencode/agent/` or `~/.config/opencode/agent/`. They ship
-set to `opencode-go/kimi-k3`; change `model` to whatever you run.
-
-### pi
-
-[pi](https://pi.dev) discovers skills under `.pi/skills/` or `.agents/skills/`
-in a project (and ancestors up to the git root), or `~/.pi/agent/skills/` or
-`~/.agents/skills/` globally, and loads them automatically with no per-skill
-allow step.
-
-`spec` and `constitution` work as-is. For `build`, `freehand` and `quest`, use
-the pi variants in `pi/` instead of the top-level pair, copying `pi/build` as
-`build`, `pi/freehand` as `freehand` and `pi/quest` as `quest` (only one
-version of each skill name can be installed). Each pi variant is
-self-contained - `build` and `freehand` own their reviewer prompts inside the
-skill directory, and `quest` needs no prompt at all - so there are no agent
-files to install.
-
-On every platform the `name` and `description` frontmatter are the only required
-fields; the Claude-specific `argument-hint` is ignored elsewhere. Wherever a
-skill says "spawn the `build-reviewer` subagent", "spawn the
-`freehand-reviewer` subagent" or "spawn the `quest-worker` subagent", Claude
-Code and opencode dispatch to that agent by name. pi has no subagents, so its
-skill variants instead spawn a fresh pi process to play the reviewer or worker -
-see [The pi variants](#the-pi-variants).
+Two skills have dependencies: `build` uses the `quest` skill (included here),
+and `freehand` uses the [grill-me](https://www.aihero.dev/skills-grill-me)
+skill. Install those alongside.
 
 ## Other workflows worth a look
 
