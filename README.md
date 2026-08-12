@@ -236,10 +236,25 @@ uncapped.
 
 ## Installation
 
-Each skill is a directory containing a `SKILL.md`; installing means copying the
-directories under a skills directory the coding agent scans - `.claude/skills/`
-for Claude Code, `.opencode/skills/` for opencode, or `.pi/skills/` for pi, in
-the project or the user's home directory. There are no agent files and no
+The easiest way is the [skills CLI](https://skills.sh):
+
+```
+skills add johngrimes/mojoflow
+```
+
+This installs all five skills to the coding agent detected in the current
+directory. Useful flags:
+
+- `-g` - install globally (user-level) instead of to the current project.
+- `-a <agents>` - install for specific agents (e.g. `claude-code`, `opencode`,
+  `codex`); use `*` for all agents.
+- `-s <skills>` - install specific skills only (e.g. `-s build -s quest`).
+- `--copy` - copy the files instead of symlinking them.
+
+Or install by hand: each skill is a directory containing a `SKILL.md`; copy
+them under a skills directory the coding agent scans - `.claude/skills/` for
+Claude Code, `.opencode/skills/` for opencode, or `.pi/skills/` for pi, in the
+project or the user's home directory. There are no agent files and no
 per-agent variants to install.
 
 Two skills have dependencies: `build` uses the `quest` skill (included here),
