@@ -12,6 +12,8 @@ prompting the agent, provide the full spec but only request that a single phase
 of the spec be implemented. This ensures that tasks given to agents are bounded
 in their effort.
 
+Also request that the implementation agent marks tasks complete as they go.
+
 When all phases have been implemented and all tasks have been marked as
 complete, up to [max-rounds] of adversarial review are carried out via a
 reviewer subagent.
