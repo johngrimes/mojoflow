@@ -121,4 +121,4 @@ Use the following model and effort settings for the subagents, depending on the
 coding agent in use:
 
 - Claude Code: Fable (medium) for reviewer subagents.
-- OpenCode and Pi: Kimi K3 (default) for reviewer subagents.
+- OpenCode and Pi: Deepseek V4 Flash (max) reviewer subagents.
