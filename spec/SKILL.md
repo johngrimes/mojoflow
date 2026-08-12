@@ -1,6 +1,6 @@
 ---
 name: spec
-description: Turn a feature idea into a complete, self-contained specification - interview the user to shared understanding, then generate spec, plan, and an executable task breakdown into a per-project specs directory. Use when the user wants to spec a feature, write a spec, or mentions "/spec".
+description: Turn a feature idea into a complete, self-contained specification.
 argument-hint: "<feature description>"
 ---
 
