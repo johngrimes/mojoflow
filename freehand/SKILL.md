@@ -15,6 +15,9 @@ grilling session.
 When implementation is complete, up to [max-rounds] of adversarial review are
 carried out via a reviewer subagent.
 
+Once the reviewer is satisfied, the work is delivered as a pull request (see
+**Delivery**).
+
 ## Review
 
 Use the following prompt template for the reviewer subagent:
@@ -114,6 +117,31 @@ review. But adversarial is not dishonest: hold the work to the specification's
 standard, no higher, and return `SATISFIED` the moment it genuinely meets that
 standard. Manufacturing objections is as much a failure as rubber-stamping.
 ```
+
+## Delivery
+
+Delivery runs only on `VERDICT: SATISFIED`. A capped or impasse finish skips it
+entirely: the work stays local and you report where it stopped.
+
+1. **Ask to deliver.** Ask the user for approval to push the branch and open a
+   draft pull request. If the branch name carries a `worktree-` prefix, propose
+   a replacement in the same ask (a short name for what was built) and rename it
+   with `git branch -m` before pushing. Without approval the work stays local,
+   and you go straight to the report.
+
+2. **Push and open the pull request.** Push the branch and open the pull request
+   in draft status, using the `github-cli` skill.
+
+3. **See CI through.** Watch the pull request's checks (`gh pr checks --watch`,
+   or the repository's equivalent) until they finish. On failure, diagnose, fix,
+   commit and push again - step 1's approval covers follow-up pushes to the same
+   branch - and watch the new run. Stop only on green checks, or on an impasse
+   to bring back to the user.
+
+4. **Report** the pull request URL and the CI outcome.
+
+Never rename the branch, push, or open the pull request without the approval
+from step 1.
 
 ## Agent settings
 
