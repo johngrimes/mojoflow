@@ -12,6 +12,8 @@ ambiguities from a pure requirements perspective.
 Implementation is then carried out based on the prompt and the results of the
 grilling session.
 
+Before starting implementation, move to a new branch and worktree.
+
 When implementation is complete, up to [max-rounds] of adversarial review are
 carried out via a reviewer subagent.
 
