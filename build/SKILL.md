@@ -6,6 +6,8 @@ argument-hint: "[spec-selector] [max-rounds]"
 
 The input to this skill is a spec bundle that the `spec` skill produced.
 
+Before starting implementation, move to a new branch and worktree.
+
 Implementation of the spec is carried out using the `quest` skill, which
 repeatedly invokes implementation agents until all work is complete. When
 prompting the agent, provide the full spec but only request that a single phase
