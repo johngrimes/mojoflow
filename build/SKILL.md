@@ -179,4 +179,4 @@ coding agent in use:
 - Claude Code: Opus (medium effort) for `quest` subagents, Fable (medium) for
   reviewer subagents.
 - OpenCode and Pi: DeepSeek V4 Flash (high) for `quest` subagents, Deepseek V4
-  Flash (max) for reviewer subagents.
+  Pro (max) for reviewer subagents.
