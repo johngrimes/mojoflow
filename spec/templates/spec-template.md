@@ -79,15 +79,6 @@ _Mark genuinely unresolved points (kept to a minimum after grilling) as:_
 - **SC-001**: [Measurable metric, e.g. "Users complete account creation in under 2 minutes".]
 - **SC-002**: [Measurable metric, e.g. "System handles 1000 concurrent users without degradation".]
 
-## User Interface _(include only if the feature has a UI)_
-
-<!--
-  When the feature involves screens, list them here and link the lo-fi HTML
-  wireframes generated into the wireframes/ subdirectory of this feature.
--->
-
-- **[Screen name]**: [Purpose and key elements.] Wireframe: `wireframes/[screen].html`
-
 ## Assumptions
 
 <!--

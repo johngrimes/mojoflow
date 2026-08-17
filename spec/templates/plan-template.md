@@ -53,7 +53,6 @@ justified, revise the design rather than proceed.
 ├── data-model.md      # Phase 1 output (if the feature involves data).
 ├── quickstart.md      # Phase 1 output.
 ├── contracts/         # Phase 1 output (if the feature exposes interfaces).
-├── wireframes/        # Lo-fi HTML wireframes (if the feature has a UI).
 ├── checklists/        # Quality checklists.
 └── tasks.md           # Generated last.
 ```

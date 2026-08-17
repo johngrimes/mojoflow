@@ -10,8 +10,8 @@ directory for the companion `build` skill to consume. The flow is **grill → sp
 → grill → plan → tasks**, run soft: no approval gates, the user can interrupt at
 any point, and the second grilling surfaces anything wrong with the spec.
 
-This skill is self-contained. It owns its templates (`templates/`) and its
-wireframing assets (`wireframing/`), and calls no external CLI or other skill.
+This skill is self-contained. It owns its templates (`templates/`) and calls no
+external CLI or other skill.
 
 ## Where specs live
 
@@ -36,16 +36,15 @@ what they want to build before doing anything else.
 
 ## Procedure
 
-### 1. Grill: requirements, scope and UI
+### 1. Grill: requirements and scope
 
 Interview the user relentlessly - one question at a time, each with your
 recommended answer - until the requirements are unambiguous, not before. Walk
 each branch of the decision tree, resolving dependencies between decisions in
 order, and explore the codebase rather than asking anything it can answer. Cover
 at least: scope and boundaries, the prioritised user journeys and their
-acceptance criteria, edge cases, data, success criteria, and - crucially -
-whether the feature has a user interface and what screens it needs. Write no
-files during this step.
+acceptance criteria, edge cases, data, and success criteria. Write no files
+during this step.
 
 ### 2. Create the feature directory
 
@@ -83,16 +82,7 @@ every item passes:
 - Feature readiness: every functional requirement has acceptance criteria; user
   scenarios cover the primary flows.
 
-### 4. Generate wireframes (only if the feature has a UI)
-
-Generate lo-fi HTML wireframes into `<feature-dir>/wireframes/`, following
-`wireframing/ui-patterns.md` and starting each screen from
-`wireframing/wireframe-template.html`. One self-contained file per screen,
-grayscale only, realistic placeholder content, screens linked so the prototype
-is clickable. List the screens and link the wireframes from the spec's "User
-Interface" section.
-
-### 5. Grill: technical approach
+### 4. Grill: technical approach
 
 Interview the user again in the same style about the technical decisions:
 language and version, frameworks and dependencies, storage, testing tools,
@@ -101,7 +91,7 @@ shape of any external interface contracts. Ground these in the existing codebase
 by detecting the stack, conventions and structure already in use, rather than
 asking what you can discover. Stop when the approach is settled.
 
-### 6. Write the plan
+### 5. Write the plan
 
 From `templates/plan-template.md`, write `<feature-dir>/plan.md`. Fill the
 Technical Context from the grilling, and complete the **Constitution Check**
@@ -120,7 +110,7 @@ Then produce the Phase 0/1 design artifacts:
   appropriate to the project type. Skip for purely internal work.
 - `quickstart.md` - the key end-to-end integration scenarios.
 
-### 7. Write the tasks
+### 6. Write the tasks
 
 From `templates/tasks-template.md`, write `<feature-dir>/tasks.md`, derived from
 the spec's user stories (with priorities), the plan, the data model and the
@@ -135,14 +125,14 @@ exact file path`. `[P]` only for tasks on different files with no incomplete
 - Setup and Foundational phases first, then user stories in priority order, then
   a Polish phase, plus a dependencies/execution-order section.
 
-### 8. Consistency check
+### 7. Consistency check
 
 Pass over the artifacts and fix every issue you find:
 
 - Every functional requirement maps to at least one task; add any task that is
   missing.
-- No task references an entity, contract or screen the plan/spec never defines;
-  add the missing definition or correct the stray reference.
+- No task references an entity or contract the plan/spec never defines; add the
+  missing definition or correct the stray reference.
 - No contradiction between spec, plan and tasks; reconcile them to a single
   consistent statement.
 
@@ -151,7 +141,7 @@ introduces a fresh inconsistency. Only where a fix turns on a decision the
 grilling never settled - a genuine contradiction with no clearly correct side -
 stop and ask the user rather than guessing.
 
-### 9. Report
+### 8. Report
 
 Tell the user the feature directory path, the files written, the
 requirements-checklist result, any consistency issues found and how you resolved
