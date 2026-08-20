@@ -152,10 +152,8 @@ Delivery runs only on `VERDICT: SATISFIED`. A capped or impasse finish skips it
 entirely: the work stays local and you report where it stopped.
 
 1. **Ask to deliver.** Ask the user for approval to push the branch and open a
-   draft pull request. If the branch name carries a `worktree-` prefix, propose
-   a replacement in the same ask (e.g. the spec directory's `NNN-short-name`)
-   and rename it with `git branch -m` before pushing. Without approval the work
-   stays local, and you go straight to the report.
+   draft pull request. Without approval the work stays local, and you go
+   straight to the report.
 
 2. **Push and open the pull request.** Push the branch and open the pull request
    in draft status, using the `github-cli` skill.
