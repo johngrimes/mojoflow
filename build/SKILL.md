@@ -16,6 +16,9 @@ in their effort.
 
 Also request that the implementation agent marks tasks complete as they go.
 
+If a phase comprises tasks that can be run in parallel, you may use multiple
+agents to build that phase.
+
 When all phases have been implemented and all tasks have been marked as
 complete, up to [max-rounds] of adversarial review are carried out via a
 reviewer subagent.
