@@ -147,8 +147,7 @@ from step 1.
 
 ## Agent settings
 
-Use the following model and effort settings for the subagents, depending on the
-coding agent in use:
+Use the following model and effort settings for the subagents:
 
-- Claude Code: Fable (medium) for reviewer subagents.
-- OpenCode and Pi: Deepseek V4 Pro (max) reviewer subagents.
+- If using Claude for the main build agent, use Fable (medium) for reviewer subagents.
+- Otherwise, use GLM 5.3 (high) for reviewer subagents.
