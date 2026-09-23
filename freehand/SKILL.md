@@ -144,10 +144,3 @@ entirely: the work stays local and you report where it stopped.
 
 Never rename the branch, push, or open the pull request without the approval
 from step 1.
-
-## Agent settings
-
-Use the following model and effort settings for the subagents:
-
-- If using Claude for the main build agent, use Fable (medium) for reviewer subagents.
-- Otherwise, use GLM 5.3 (high) for reviewer subagents.
