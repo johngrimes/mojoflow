@@ -154,9 +154,9 @@ standard. Manufacturing objections is as much a failure as rubber-stamping.
 Delivery runs only on `VERDICT: SATISFIED`. A capped or impasse finish skips it
 entirely: the work stays local and you report where it stopped.
 
-1. **Ask to deliver.** Ask the user for approval to push the branch and open a
-   draft pull request. Without approval the work stays local, and you go
-   straight to the report.
+1. **Ask to deliver.** Ask the user for approval to push the branch, open a
+   draft pull request, and mark it ready for review once CI is green. Without
+   approval the work stays local, and you go straight to the report.
 
 2. **Push and open the pull request.** Push the branch and open the pull request
    in draft status, using the `github-cli` skill.
@@ -167,7 +167,12 @@ entirely: the work stays local and you report where it stopped.
    branch - and watch the new run. Stop only on green checks, or on an impasse
    to bring back to the user.
 
-4. **Report** the pull request URL and the CI outcome.
+4. **Mark it ready for review.** Once the checks are green, take the pull
+   request out of draft (`gh pr ready`). Step 1's approval covers this. Skip it
+   if CI ended on an impasse.
 
-Never rename the branch, push, or open the pull request without the approval
-from step 1.
+5. **Report** the pull request URL, the CI outcome, and whether it was marked
+   ready for review.
+
+Never rename the branch, push, open the pull request, or mark it ready for
+review without the approval from step 1.

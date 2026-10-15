@@ -140,8 +140,9 @@ loop:
    and loop.
 3. Move the feature directory into `.local/specs/archive/` once built, so
    `.local/specs/` reads as a list of outstanding work.
-4. With your approval, push the branch, open a draft pull request, and watch CI
-   through to green - fixing and pushing again on failure.
+4. With your approval, push the branch, open a draft pull request, watch CI
+   through to green - fixing and pushing again on failure - then mark it ready
+   for review.
 
 The review waits for a finished `tasks.md` because that is what the
 specification describes. Acceptance scenarios and success criteria are written
@@ -160,8 +161,9 @@ to disk but the code:
 4. Spawn a fresh reviewer subagent that attacks the work against the prompt and
    the grilling session, incorporate its feedback, and loop, up to the round
    cap.
-5. With your approval, push the branch, open a draft pull request, and watch CI
-   through to green - fixing and pushing again on failure.
+5. With your approval, push the branch, open a draft pull request, watch CI
+   through to green - fixing and pushing again on failure - then mark it ready
+   for review.
 
 It never asks about the technical approach - language, frameworks, libraries,
 file layout and test tooling all come from reading the project. Nor does it
